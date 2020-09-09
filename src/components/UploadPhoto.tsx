@@ -22,7 +22,7 @@ const UploadPhoto: React.FC = () => {
       { value: title } = elements.namedItem('title') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
-    notify('Uploading...')
+    notify('Uploading photo...')
 
     try {
       await uploadPhoto({ url, title, comment }, token)

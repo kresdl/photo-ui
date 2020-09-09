@@ -20,7 +20,7 @@ const UploadAlbum: React.FC = () => {
     const { elements } = e.target as HTMLFormElement
     const { value: title } = elements.namedItem('title') as HTMLInputElement
 
-    notify('Uploading...')
+    notify('Uploading album...')
 
     try {
       await uploadAlbum({ title }, token)

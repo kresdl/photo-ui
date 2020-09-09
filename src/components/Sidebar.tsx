@@ -12,6 +12,8 @@ const Sidebar: React.FC = () =>
       <NavLink className="nav-link" to="/user/upload-photo">Add photo</NavLink>
       <NavLink className="nav-link" to="/user/upload-album">Add album</NavLink>
       <NavLink className="nav-link" to="/user/organize">Organize</NavLink>
+      <NavLink className="nav-link" to="/user/delete-photo">Delete photo</NavLink>
+      <NavLink className="nav-link" to="/user/delete-album">Delete album</NavLink>
       <NavLink className="nav-link" to="/user/logout">Logout</NavLink>
     </nav>
   </Header>

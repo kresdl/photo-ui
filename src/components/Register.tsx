@@ -4,10 +4,11 @@ import SubmitCancel from './SubmitCancel'
 import { useHistory } from 'react-router-dom'
 import { register } from '../util'
 import { useNotify } from '../hooks'
+import { Message } from '../types'
 
 const Register: React.FC = () => {
   const [pwSync, setPwSync] = useState(true),
-    history = useHistory<string>(),
+    history = useHistory<Message>(),
     { notify } = useNotify(),
 
     cancel = () => history.push('/'),
@@ -27,7 +28,7 @@ const Register: React.FC = () => {
 
       try {
         await register({ first_name, last_name, email, password })
-        history.push('/','Register successful!')
+        history.push('/', 'Register successful!')
       } catch (err) {
         notify(err)
       }

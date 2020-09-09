@@ -1,3 +1,5 @@
+export type Message = string[] | string | null | undefined
+
 type Id = { 
   id: number
 }
