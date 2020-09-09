@@ -1,0 +1,113 @@
+import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials } from './types'
+
+export const register = (register: Register) => io({
+  url: 'https://fed19-peterh-photo.herokuapp.com/register',
+  method: 'POST',
+  data: register
+})
+
+export const login = (credentials: Credentials) => io({
+  url: 'https://fed19-peterh-photo.herokuapp.com/login',
+  method: 'POST',
+  data: credentials
+}) as Promise<string>
+
+export const uploadPhoto = (photo: Photo, token: string) => io({
+  url: 'http://fed19-peterh-photo.herokuapp.com/photos',
+  method: 'POST',
+  data: photo,
+  token
+})
+
+export const uploadAlbum = (album: Album, token: string) => io({
+  url: 'http://fed19-peterh-photo.herokuapp.com/albums',
+  method: 'POST',
+  data: album,
+  token
+})
+
+export const downloadPhotos = (token: string) => io({
+  url: 'http://fed19-peterh-photo.herokuapp.com/photos',
+  method: 'GET',
+  token
+}) as Promise<SavedPhoto[]>
+
+export const downloadAlbums = (token: string) => io({
+  url: 'http://fed19-peterh-photo.herokuapp.com/albums',
+  method: 'GET',
+  token
+}) as Promise<SavedAlbum[]>
+
+export const downloadPhoto = (photo: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/photos/${photo}`,
+  method: 'GET',
+  token
+}) as Promise<SavedPhoto>
+
+export const downloadAlbum = (album: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}`,
+  method: 'GET',
+  token
+}) as Promise<SavedAlbum>
+
+export const addPhotoToAlbum = (photo: number, album: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
+  method: 'PUT',
+  token
+})
+
+export const removePhotoFromAlbum = (album: number, photo: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
+  method: 'DELETE',
+  token
+})
+
+export const deletePhoto = (photo: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/photos/${photo}`,
+  method: 'DELETE',
+  token
+})
+
+export const deleteAlbum = (album: number, token: string) => io({
+  url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}`,
+  method: 'DELETE',
+  token
+})
+
+type IOOptions = {
+  url: string,
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  data?: any,
+  token?: string
+}
+
+type Type = (opt: IOOptions) => Promise<any>
+
+const mapFail = (res: any) => 
+  Array.isArray(res) ? res.map(item => item.msg) : res
+
+export const io: Type = ({ url, method = 'GET', data, token }) =>
+  new Promise(async (resolve, reject) => {
+    const headers = new Headers()
+    headers.append('Content-Type', 'application/json')
+    token && headers.append('Authorization', 'Bearer ' + token)
+
+    try {
+      const response = await fetch(url, {
+        method: method.toUpperCase(),
+        headers,
+        body: JSON.stringify(data)
+      })
+      const results = await response.json()
+
+      if (results.status === 'error') {
+        reject(mapFail(results.status))
+      } else if (results.status === 'fail') {
+        reject(mapFail(results.data))
+      } else {
+        resolve(results.data)
+      }
+    } catch (err) {
+      reject('Network error')
+    }
+  });
