@@ -1,8 +1,9 @@
 import React from 'react'
 import { SavedAlbum } from '../types'
 import Album from './Album'
-import { TransitionGroup, Transition } from 'react-transition-group'
-import TransitionListItem from './TransitionListItem'
+import transitionListFactory from '../transitionListFactory'
+
+const TransitionList = transitionListFactory<SavedAlbum>(Album)
 
 type Props = {
   albums?: SavedAlbum[],
@@ -10,19 +11,6 @@ type Props = {
 }
 
 const Albums: React.FC<Props> = ({ albums, onSelect }) =>
-  <TransitionGroup as="ul" className="list-group">
-    {
-      albums?.map(album =>
-        <Transition key={album.id} timeout={300}>
-          {
-            state =>
-              <TransitionListItem state={state}>
-                <Album {...album} onSelect={() => onSelect(album)}/>
-              </TransitionListItem>
-          }
-        </Transition>
-      )
-    }
-  </TransitionGroup>
+  <TransitionList items={albums} onSelect={album => onSelect(album)} />
 
 export default Albums

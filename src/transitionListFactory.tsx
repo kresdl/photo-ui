@@ -1,7 +1,7 @@
 import React from 'react'
 import { TransitionGroup, Transition } from 'react-transition-group'
-import TransitionListItem from './TransitionListItem'
-import { Id } from '../types'
+import TransitionListItem from './components/TransitionListItem'
+import { Id } from './types'
 
 type SelectableItem = {
   onSelect: (id: number) => void
@@ -9,13 +9,11 @@ type SelectableItem = {
 
 type Props<T> = {
   items?: T[],
-  Comp: React.FC<T & SelectableItem>
   onSelect: (item: T) => void
 }
 
-function TransitionList<T extends Id>() {
-
-  const Comp: React.FC<Props<T>> = ({ items, onSelect, Comp }) =>
+const transitionListFactory = <T extends Id>(Component: React.FC<T & SelectableItem>) =>
+  (({ items, onSelect }) =>
     <TransitionGroup as="ul" className="list-group">
       {
         items?.map(item =>
@@ -23,15 +21,14 @@ function TransitionList<T extends Id>() {
             {
               state =>
                 <TransitionListItem state={state}>
-                  <Comp {...item} onSelect={() => void onSelect(item)} />
+                  <Component {...item} onSelect={() => void onSelect(item)} />
                 </TransitionListItem>
             }
           </Transition>
         )
       }
     </TransitionGroup>
-  
-  return Comp
-}
+  ) as React.FC<Props<T>>
 
-export default TransitionList
+
+export default transitionListFactory
