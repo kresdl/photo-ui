@@ -3,7 +3,7 @@ import { SavedAlbum } from '../types'
 
 type Props = {
   albums: SavedAlbum[]
-  onChange: (id: number) => void
+  onChange: (id: number) => unknown
 }
 
 const AlbumSelect: React.FC<Props> = ({ albums, onChange }) =>

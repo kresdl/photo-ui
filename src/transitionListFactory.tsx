@@ -3,8 +3,8 @@ import { TransitionGroup, Transition } from 'react-transition-group'
 import TransitionListItem from './components/TransitionListItem'
 import { Id } from './types'
 
-type SelectableItem = {
-  onSelect: (id: number) => void
+type SelectableItem<T> = {
+  onSelect: (item: T) => void
 }
 
 type Props<T> = {
@@ -12,7 +12,7 @@ type Props<T> = {
   onSelect: (item: T) => void
 }
 
-const transitionListFactory = <T extends Id>(Component: React.FC<T & SelectableItem>) =>
+const transitionListFactory = <T extends Id>(Component: React.FC<T & SelectableItem<T>>) =>
   (({ items, onSelect }) =>
     <TransitionGroup as="ul" className="list-group">
       {

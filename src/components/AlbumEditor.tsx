@@ -9,11 +9,11 @@ const AlbumEditor: React.FC = () => {
   const { msg, notify } = useNotify()
   const { downloadAlbums, deleteAlbum, uploadAlbum, albums } = useAlbums()
 
-  const discard = async (album: SavedAlbum) => {
+  const discard = async ({ id }: SavedAlbum) => {
     notify('Deleting album...')
 
     try {
-      await deleteAlbum(album.id)
+      await deleteAlbum(id)
       notify('Album deleted!')
     } catch (err) {
       notify(err)

@@ -9,11 +9,11 @@ const PhotoEditor: React.FC = () => {
   const { msg, notify } = useNotify()
   const { downloadPhotos, deletePhoto, uploadPhoto, photos } = usePhotos()
 
-  const discard = async (photo: SavedPhoto) => {
+  const discard = async ({ id }: SavedPhoto) => {
     notify('Deleting photo...')
 
     try {
-      await deletePhoto(photo.id)
+      await deletePhoto(id)
       notify('Photo deleted!')
     } catch (err) {
       notify(err)
