@@ -1,10 +1,12 @@
 /* eslint-disable no-throw-literal */
 import { useState, useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto, Album, Photo } from './types'
+import { Message, SavedAlbum, SavedPhoto, Album, Photo, Title } from './types'
 import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, 
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
+
+const byTitle = (a: Title, b: Title) => a.title > b.title ? 1 : -1
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!
@@ -48,7 +50,8 @@ export const usePhotos = () => {
     photos, setPhotos,
 
     downloadPhotos: useCallback(async () => {
-      const dl = await downloadPhotos()
+      let dl = await downloadPhotos()
+      dl = dl.sort(byTitle)
       setPhotos(dl)
       return dl
     }, [setPhotos]),
@@ -62,7 +65,7 @@ export const usePhotos = () => {
 
     uploadPhoto: useCallback(async (photo: Photo) => {
       const saved = await uploadPhoto(photo) as SavedPhoto
-      setPhotos([...photos, saved])
+      setPhotos([...photos, saved].sort(byTitle))
     }, [photos])
   }
 }
@@ -75,7 +78,7 @@ export const useAlbums = () => {
 
     downloadAlbums: useCallback(async () => {
       const dl = await downloadAlbums()
-      setAlbums(dl)
+      setAlbums(dl.sort(byTitle))
       return dl
     }, [setAlbums]),
 
@@ -88,7 +91,7 @@ export const useAlbums = () => {
 
     uploadAlbum: useCallback(async (album: Album) => {
       const saved = await uploadAlbum(album) as SavedAlbum
-      setAlbums([...albums, saved])
+      setAlbums([...albums, saved].sort(byTitle))
     }, [albums])
   }
 }
@@ -102,7 +105,7 @@ export const useAlbum = () => {
     addPhoto: useCallback((photo: SavedPhoto) => {
       setAlbum(album => album && {
         ...album,
-        photos: [...album.photos!, photo]
+        photos: [...album.photos!, photo].sort(byTitle)
       })
     }, []),
 

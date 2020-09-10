@@ -4,15 +4,16 @@ export type Id = {
   id: number
 }
 
-export type Photo = {
+export type Title = {
+  title: string
+}
+
+export type Photo = Title & {
   url: string,
-  title: string,
   comment?: string
 }
 
-export type Album = {
-  title: string
-}
+export type Album = Title
 
 export type Credentials = {
   email: string,

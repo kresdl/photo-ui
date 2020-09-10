@@ -1,7 +1,7 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import Panel from './Panel'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 const Header = styled.header`
   background-color: rgb(40, 40, 50);
