@@ -3,7 +3,7 @@ import { SavedPhoto } from '../types'
 import Photo from './Photo'
 import transitionListFactory from '../transitionListFactory'
 
-const TransitionList = transitionListFactory<SavedPhoto>(Photo)
+const TransitionList = transitionListFactory(Photo)
 
 type Props = {
   photos?: SavedPhoto[],
@@ -11,6 +11,6 @@ type Props = {
 }
 
 const Photos: React.FC<Props> = ({ photos, onSelect }) =>
-  <TransitionList items={photos} onSelect={photo => onSelect(photo)} />
+  <TransitionList items={photos} onSelect={onSelect} />
 
 export default Photos

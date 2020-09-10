@@ -1,19 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import UploadPhoto from './UploadPhoto'
 import Photos from './Photos'
+import { usePhotos, useNotify } from '../hooks'
 import { SavedPhoto } from '../types'
+import Message from './Message'
 
-type Props = {
-  photos: SavedPhoto[],
-  onDelete: (photo: SavedPhoto) => void
-}
+const PhotoEditor: React.FC = () => {
+  const { msg, notify } = useNotify(),
+    { downloadPhotos, deletePhoto, photos, setPhotos } = usePhotos(),
+    upload = (photo: SavedPhoto) => setPhotos([...photos, photo])
 
-const PhotoEditor: React.FC<Props> = ({ photos, onDelete }) => {  
-  if (!photos.length) return null
+  useEffect(
+    () => void downloadPhotos().catch(notify), 
+    [downloadPhotos, notify]
+  )
 
   return (
-    <div>
-      <h5 className="mb-3">Photos</h5>
-      <Photos photos={photos} onSelect={onDelete} />
+    <div className="row">
+      <div className="col-6">
+        <UploadPhoto onUpload={upload}/>
+        <Message msg={msg} />
+      </div>
+      <div className="col-6">
+        <h5 className="mb-3">Photos</h5>
+        <Photos photos={photos} onSelect={deletePhoto}/>
+      </div>
     </div>
   )
 }

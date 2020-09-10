@@ -3,7 +3,7 @@ import { SavedAlbum } from '../types'
 import Album from './Album'
 import transitionListFactory from '../transitionListFactory'
 
-const TransitionList = transitionListFactory<SavedAlbum>(Album)
+const TransitionList = transitionListFactory(Album)
 
 type Props = {
   albums?: SavedAlbum[],
@@ -11,6 +11,6 @@ type Props = {
 }
 
 const Albums: React.FC<Props> = ({ albums, onSelect }) =>
-  <TransitionList items={albums} onSelect={album => onSelect(album)} />
+  <TransitionList items={albums} onSelect={onSelect} />
 
 export default Albums

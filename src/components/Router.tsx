@@ -1,17 +1,12 @@
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 import Splash from './Splash'
 import User from './User'
-import { useNotify } from '../hooks'
-import { useLocation, Switch, Route } from 'react-router-dom'
-import { Message } from '../types'
+import { useRouteMessage, useLogout } from '../hooks'
+import { Switch, Route } from 'react-router-dom'
 
 const App: React.FC = () => {
-  const { pathname, state: msg } = useLocation<Message>()
-  const { notify } = useNotify()
-
-  useLayoutEffect(() => {
-    notify(msg)
-  }, [pathname, msg, notify])
+  useLogout('/user/logout', '/')
+  useRouteMessage()
 
   return (
     <Switch>

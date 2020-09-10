@@ -1,32 +1,26 @@
-import React, { useEffect } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
-import { useNotify } from '../hooks'
+import React from 'react'
 import Sidebar from './Sidebar'
-import Main from './Main'
+import Panel from './Panel'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 100vh;
 `
 
-const User: React.FC = () => {
-  const history = useHistory(),
-    { pathname } = useLocation(),
-    { notify } = useNotify()
+const Header = styled.header`
+  background-color: rgb(40, 40, 50);
+`
 
-  useEffect(() => {
-    if (pathname === '/user/logout') {
-      sessionStorage.removeItem('token')
-      history.push('/')
-    }
-  }, [history, notify, pathname])
-
-  return (
-    <Wrapper className="row">
+const User: React.FC = () =>
+  <Wrapper className="row">
+    <Header className="col-auto">
       <Sidebar />
-      <Main />
-    </Wrapper>
-  )
-}
+    </Header>
+    <main className="col">
+      <div className="pt-5 px-5">
+        <Panel />
+      </div>
+    </main>
+  </Wrapper>
 
 export default User

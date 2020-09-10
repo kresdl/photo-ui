@@ -1,8 +1,13 @@
 import React, { useRef } from 'react'
-import * as Types from '../types'
 import styled from 'styled-components'
 import { TransitionStatus } from 'react-transition-group/Transition'
-import { margin, opacity } from 'styled-system'
+import { margin, opacity, MarginProps, OpacityProps } from 'styled-system'
+
+type TransitionStyles = Partial<Record<TransitionStatus, MarginProps & OpacityProps>>
+
+type Props = {
+  state: TransitionStatus
+}
 
 const Li = styled.li`
   opacity: 0;
@@ -13,12 +18,8 @@ const Li = styled.li`
   ${opacity}
 `
 
-type Props = {
-  state: TransitionStatus
-}
-
 const TransitionListItem: React.FC<Props> = ({ state, children }) => {
-  const styles = useRef<Types.TransitionStyles | null>(null),
+  const styles = useRef<TransitionStyles | null>(null),
     style = styles.current?.[state],
     
     ref: React.RefCallback<HTMLLIElement> = em => {

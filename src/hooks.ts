@@ -1,7 +1,8 @@
-import { useState, useContext, useCallback } from 'react'
+import { useState, useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
 import { Message, SavedAlbum, SavedPhoto } from './types'
 import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, removePhotoFromAlbum, deletePhoto, deleteAlbum } from './util'
+import { useHistory, useLocation } from 'react-router-dom'
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!
@@ -16,26 +17,26 @@ export const useNotify = () => {
   }
 }
 
-export const useAlbum = () => {
-  const [album, setAlbum] = useState<SavedAlbum | null>(null)
+export const useRouteMessage = () => {
+  const { pathname, state } = useLocation<Message>()
+  const { notify } = useNotify()
 
-  return {
-    album, setAlbum,
+  useLayoutEffect(
+    () => notify(state), 
+    [pathname, state, notify]
+  )
+}
 
-    addPhoto: useCallback((photo: SavedPhoto) => {
-      setAlbum(album => album && {
-        ...album,
-        photos: [...album.photos!, photo]
-      })
-    }, []),
+export const useLogout = (path: string, redirect: string) => {
+  const history = useHistory(),
+    { pathname } = useLocation()
 
-    removePhoto: useCallback((photo: SavedPhoto) => {
-      setAlbum(album => album && {
-        ...album,
-        photos: album.photos!.filter(p => photo.id !== p.id)
-      })
-    }, [])
-  }
+  useEffect(() => {
+    if (pathname === path) {
+      sessionStorage.removeItem('token')
+      history.push(redirect)
+    }
+  }, [path, redirect, history, pathname])
 }
 
 export const usePhotos = () => {
@@ -109,6 +110,28 @@ export const useAlbums = () => {
         notify(err)
       }
     }, [albums, notify])
+  }
+}
+
+export const useAlbum = () => {
+  const [album, setAlbum] = useState<SavedAlbum | null>(null)
+
+  return {
+    album, setAlbum,
+
+    addPhoto: useCallback((photo: SavedPhoto) => {
+      setAlbum(album => album && {
+        ...album,
+        photos: [...album.photos!, photo]
+      })
+    }, []),
+
+    removePhoto: useCallback((photo: SavedPhoto) => {
+      setAlbum(album => album && {
+        ...album,
+        photos: album.photos!.filter(p => photo.id !== p.id)
+      })
+    }, [])
   }
 }
 

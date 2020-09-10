@@ -1,6 +1,3 @@
-import { MarginProps, OpacityProps } from "styled-system"
-import { TransitionStatus } from "react-transition-group/Transition"
-
 export type Message = string[] | string | null | undefined
 
 export type Id = { 
@@ -32,5 +29,3 @@ export type SavedPhoto = Id & Photo
 export type SavedAlbum = Id & Album & {
   photos?: SavedPhoto[]
 }
-
-export type TransitionStyles = Partial<Record<TransitionStatus, MarginProps & OpacityProps>>

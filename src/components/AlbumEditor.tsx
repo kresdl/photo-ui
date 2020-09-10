@@ -1,19 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
 import { SavedAlbum } from '../types'
+import { useNotify, useAlbums } from '../hooks'
+import Message from './Message'
 
-type Props = {
-  albums: SavedAlbum[]
-  onDelete: (photo: SavedAlbum) => void
-}
+const AlbumEditor: React.FC = () => {
+  const { msg, notify } = useNotify(),
+    { downloadAlbums, deleteAlbum, albums, setAlbums } = useAlbums(),
+    upload = (album: SavedAlbum) => setAlbums([...albums, album])
 
-const AlbumEditor: React.FC<Props> = ({ albums, onDelete }) => {
-  if (!albums.length) return null
+  useEffect(
+    () => void downloadAlbums().catch(notify), 
+    [downloadAlbums, notify]
+  )
 
   return (
-    <div>
-      <h5 className="mb-3">Albums</h5>
-      <Albums albums={albums} onSelect={onDelete} />
+    <div className="row">
+      <div className="col-6">
+        <UploadAlbum onUpload={upload}/>
+        <Message msg={msg} />
+      </div>
+      <div className="col-6">
+        <h5 className="mb-3">Albums</h5>
+        <Albums albums={albums} onSelect={deleteAlbum}/>
+      </div>
     </div>
   )
 }
