@@ -9,16 +9,14 @@ const Organize: React.FC = () => {
   const { msg, notify } = useNotify()
 
   useEffect(
-    () => void download().catch(notify), 
+    () => void download().catch(notify),
     [download, notify]
   )
 
   useEffect(
-    () => void (albums.length && cd(albums[0].id).catch(notify)), 
+    () => void (albums.length && cd(albums[0].id).catch(notify)),
     [albums, cd, notify]
   )
-
-  if (!photos.length || !albums.length || !album) return null
 
   return (
     <div className="row">
@@ -29,12 +27,19 @@ const Organize: React.FC = () => {
       </div>
       <div className="col-6">
         <h5 className="mb-3">Album</h5>
-        <div className="mb-3">
-          <AlbumSelect albums={albums} onChange={cd} />
-        </div>
-        <div key={album.id}>
-          <Photos photos={album.photos} onSelect={remove} />
-        </div>
+        {
+          albums.length 
+          ? <div className="mb-3">
+              <AlbumSelect albums={albums} onChange={cd} />
+            </div>
+          : null
+        }
+        {
+          album &&
+          <div key={album.id}>
+            <Photos photos={album.photos} onSelect={remove} />
+          </div>
+        }
       </div>
     </div>
   )

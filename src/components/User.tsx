@@ -3,16 +3,12 @@ import Sidebar from './Sidebar'
 import Panel from './Panel'
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
-  height: 100vh;
-`
-
 const Header = styled.header`
   background-color: rgb(40, 40, 50);
 `
 
 const User: React.FC = () =>
-  <Wrapper className="row">
+  <div className="row vh-100">
     <Header className="col-auto">
       <Sidebar />
     </Header>
@@ -21,6 +17,6 @@ const User: React.FC = () =>
         <Panel />
       </div>
     </main>
-  </Wrapper>
+  </div>
 
 export default User
