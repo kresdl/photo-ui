@@ -1,29 +1,47 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
-import { SavedAlbum } from '../types'
 import { useNotify, useAlbums } from '../hooks'
 import Message from './Message'
+import { SavedAlbum } from '../types'
 
 const AlbumEditor: React.FC = () => {
-  const { msg, notify } = useNotify(),
-    { downloadAlbums, deleteAlbum, albums, setAlbums } = useAlbums(),
-    upload = (album: SavedAlbum) => setAlbums([...albums, album])
+  const { msg, notify } = useNotify()
+  const { downloadAlbums, deleteAlbum, uploadAlbum, albums } = useAlbums()
 
-  useEffect(
-    () => void downloadAlbums().catch(notify), 
-    [downloadAlbums, notify]
-  )
+  const discard = async (album: SavedAlbum) => {
+    notify('Deleting album...')
+
+    try {
+      await deleteAlbum(album.id)
+      notify('Album deleted!')
+    } catch (err) {
+      notify(err)
+    }    
+  }
+
+  const mount = useCallback(async () => {
+    notify('Downloading photos...')
+
+    try {
+      await downloadAlbums()
+      notify(null)
+    } catch (err) {
+      notify(err)
+    }
+  }, [notify, downloadAlbums])
+
+  useEffect(() => void mount(), [mount])
 
   return (
     <div className="row">
       <div className="col-6">
-        <UploadAlbum onUpload={upload}/>
+        <UploadAlbum onUpload={uploadAlbum}/>
         <Message msg={msg} />
       </div>
       <div className="col-6">
         <h5 className="mb-3">Albums</h5>
-        <Albums albums={albums} onSelect={deleteAlbum}/>
+        <Albums albums={albums} onSelect={discard}/>
       </div>
     </div>
   )

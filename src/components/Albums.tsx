@@ -7,7 +7,7 @@ const TransitionList = transitionListFactory(Album)
 
 type Props = {
   albums?: SavedAlbum[],
-  onSelect: (album: SavedAlbum) => void
+  onSelect: (album: SavedAlbum) => unknown
 }
 
 const Albums: React.FC<Props> = ({ albums, onSelect }) =>

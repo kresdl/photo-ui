@@ -1,7 +1,9 @@
+/* eslint-disable no-throw-literal */
 import { useState, useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto } from './types'
-import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, removePhotoFromAlbum, deletePhoto, deleteAlbum } from './util'
+import { Message, SavedAlbum, SavedPhoto, Album, Photo } from './types'
+import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, 
+  removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
 
 export const useNotify = () => {
@@ -22,7 +24,7 @@ export const useRouteMessage = () => {
   const { notify } = useNotify()
 
   useLayoutEffect(
-    () => notify(state), 
+    () => notify(state),
     [pathname, state, notify]
   )
 }
@@ -41,75 +43,53 @@ export const useLogout = (path: string, redirect: string) => {
 
 export const usePhotos = () => {
   const [photos, setPhotos] = useState<SavedPhoto[]>([])
-  const { notify } = useNotify()
 
-  return { 
+  return {
     photos, setPhotos,
 
     downloadPhotos: useCallback(async () => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Downloading photos...')
-      const dl = await downloadPhotos(token)
+      const dl = await downloadPhotos()
       setPhotos(dl)
-      notify(null)
+      return dl
+    }, [setPhotos]),
 
-    }, [notify, setPhotos]),
+    deletePhoto: useCallback(async (id: number) => {
+      await deletePhoto(id)
+      setPhotos(photos.filter(
+        photo => photo.id !== id
+      ))
+    }, [photos, setPhotos]),
 
-    deletePhoto: useCallback(async (photo: SavedPhoto) => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Deleting photo...')
-
-      try {
-        await deletePhoto(photo.id, token)
-        setPhotos(photos.filter(
-          ({ id }) => id !== photo.id
-        ))
-        notify(null)
-      } catch (err) {
-        notify(err)
-      }
-    }, [photos, setPhotos, notify])
+    uploadPhoto: useCallback(async (photo: Photo) => {
+      const saved = await uploadPhoto(photo) as SavedPhoto
+      setPhotos([...photos, saved])
+    }, [photos])
   }
 }
 
 export const useAlbums = () => {
   const [albums, setAlbums] = useState<SavedAlbum[]>([])
-  const { notify } = useNotify()
 
-  return { 
+  return {
     albums, setAlbums,
 
     downloadAlbums: useCallback(async () => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Downloading albums...')
-      const dl = await downloadAlbums(token)
+      const dl = await downloadAlbums()
       setAlbums(dl)
-      notify(null)
+      return dl
+    }, [setAlbums]),
 
-    }, [notify, setAlbums]),
+    deleteAlbum: useCallback(async (id: number) => {
+      await deleteAlbum(id)
+      setAlbums(albums.filter(
+        album => album.id !== id
+      ))
+    }, [albums]),
 
-    deleteAlbum: useCallback(async (album: SavedAlbum) => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Deleting album...')
-
-      try {
-        await deleteAlbum(album.id, token)
-        setAlbums(albums.filter(
-          ({ id }) => id !== album.id
-        ))
-        notify(null)
-      } catch (err) {
-        notify(err)
-      }
-    }, [albums, notify])
+    uploadAlbum: useCallback(async (album: Album) => {
+      const saved = await uploadAlbum(album) as SavedAlbum
+      setAlbums([...albums, saved])
+    }, [albums])
   }
 }
 
@@ -126,10 +106,10 @@ export const useAlbum = () => {
       })
     }, []),
 
-    removePhoto: useCallback((photo: SavedPhoto) => {
+    removePhoto: useCallback((id: number) => {
       setAlbum(album => album && {
         ...album,
-        photos: album.photos!.filter(p => photo.id !== p.id)
+        photos: album.photos!.filter(photo => photo.id !== id)
       })
     }, [])
   }
@@ -138,60 +118,24 @@ export const useAlbum = () => {
 export const useOrganizer = () => {
   const { downloadPhotos, photos } = usePhotos(),
     { downloadAlbums, albums } = useAlbums(),
-    { album, setAlbum, addPhoto, removePhoto } = useAlbum(),
-    { notify } = useNotify()
+    { album, setAlbum, addPhoto, removePhoto } = useAlbum()
 
   return {
     photos, albums, album,
-
-    download: useCallback(async () => {
-      await downloadPhotos()
-      await downloadAlbums()
-    }, [downloadPhotos, downloadAlbums]),
+    downloadPhotos, downloadAlbums,
 
     cd: useCallback(async (id: number) => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Downloading album...')
-
-      try {
-        const newAlbum = await downloadAlbum(id, token)
-        setAlbum(newAlbum)
-        notify(null)
-      } catch (err) {
-        notify(err)
-      }
-    }, [notify, setAlbum]),
+      setAlbum(await downloadAlbum(id))
+    }, [setAlbum]),
 
     add: useCallback(async (photo: SavedPhoto) => {
-      const token = sessionStorage.getItem('token')
-      if (!token || !album) return
+      await addPhotoToAlbum(photo.id, album!.id)
+      addPhoto(photo)
+    }, [addPhoto, album]),
 
-      notify('Adding photo...')
-
-      try {
-        await addPhotoToAlbum(photo.id, album.id, token)
-        addPhoto(photo)
-        notify(null)
-      } catch (err) {
-        notify(err)
-      }
-    }, [addPhoto, album, notify]),
-
-    remove: useCallback(async (photo: SavedPhoto) => {
-      const token = sessionStorage.getItem('token')
-      if (!token) return
-
-      notify('Removing photo...')
-
-      try {
-        await removePhotoFromAlbum(album!.id, photo.id, token)
-        removePhoto(photo)
-        notify(null)
-      } catch (err) {
-        notify(err)
-      }
-    }, [album, notify, removePhoto])
+    remove: useCallback(async (id: number) => {
+      await removePhotoFromAlbum(album!.id, id)
+      removePhoto(id)
+    }, [album, removePhoto])
   }
 }

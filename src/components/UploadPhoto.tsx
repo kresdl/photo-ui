@@ -1,12 +1,11 @@
 import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
-import { uploadPhoto } from '../util'
+import { Photo } from '../types'
 import { useNotify } from '../hooks'
-import { SavedPhoto } from '../types'
 
 type Props = {
-  onUpload: (photo: SavedPhoto) => void
+  onUpload: (photo: Photo) => Promise<void>
 }
 
 const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
@@ -14,24 +13,22 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
   
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
-    const token = sessionStorage.getItem('token')
-    if (!token) return
 
-    const { elements } = e.target as HTMLFormElement,
+    const form = e.target as HTMLFormElement,
+      { elements } = form,
       { value: url } = elements.namedItem('url') as HTMLInputElement,
       { value: title } = elements.namedItem('title') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
-    notify('Uploading photo...')
+      notify('Uploading photo...')
 
-    try {
-      const photo = await uploadPhoto({ url, title, comment }, token) as SavedPhoto
-      notify('Upload successful!')
-      onUpload(photo)
-
-    } catch (err) {
-      notify(err)
-    }
+      try {
+        await onUpload({ url, title, comment })
+        notify('Upload successful!')
+        form.reset()
+      } catch (err) {
+        notify(err)
+      }
   }
 
   return (

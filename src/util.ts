@@ -1,4 +1,11 @@
+/* eslint-disable no-throw-literal */
 import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials } from './types'
+
+const getToken = () => {
+  const token = sessionStorage.getItem('token')
+  if (!token) throw 'Not signed in'
+  return token
+}
 
 export const register = (register: Register) => io({
   url: 'https://fed19-peterh-photo.herokuapp.com/register',
@@ -12,66 +19,66 @@ export const login = (credentials: Credentials) => io({
   data: credentials
 }) as Promise<string>
 
-export const uploadPhoto = (photo: Photo, token: string) => io({
+export const uploadPhoto = (photo: Photo) => io({
   url: 'http://fed19-peterh-photo.herokuapp.com/photos',
   method: 'POST',
   data: photo,
-  token
+  token: getToken()
 })
 
-export const uploadAlbum = (album: Album, token: string) => io({
+export const uploadAlbum = (album: Album) => io({
   url: 'http://fed19-peterh-photo.herokuapp.com/albums',
   method: 'POST',
   data: album,
-  token
+  token: getToken()
 })
 
-export const downloadPhotos = (token: string) => io({
+export const downloadPhotos = () => io({
   url: 'http://fed19-peterh-photo.herokuapp.com/photos',
   method: 'GET',
-  token
+  token: getToken()
 }) as Promise<SavedPhoto[]>
 
-export const downloadAlbums = (token: string) => io({
+export const downloadAlbums = () => io({
   url: 'http://fed19-peterh-photo.herokuapp.com/albums',
   method: 'GET',
-  token
+  token: getToken()
 }) as Promise<SavedAlbum[]>
 
-export const downloadPhoto = (photo: number, token: string) => io({
+export const downloadPhoto = (photo: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/photos/${photo}`,
   method: 'GET',
-  token
+  token: getToken()
 }) as Promise<SavedPhoto>
 
-export const downloadAlbum = (album: number, token: string) => io({
+export const downloadAlbum = (album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}`,
   method: 'GET',
-  token
+  token: getToken()
 }) as Promise<SavedAlbum>
 
-export const addPhotoToAlbum = (photo: number, album: number, token: string) => io({
+export const addPhotoToAlbum = (photo: number, album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
   method: 'PUT',
-  token
+  token: getToken()
 })
 
-export const removePhotoFromAlbum = (album: number, photo: number, token: string) => io({
+export const removePhotoFromAlbum = (album: number, photo: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
   method: 'DELETE',
-  token
+  token: getToken()
 })
 
-export const deletePhoto = (photo: number, token: string) => io({
+export const deletePhoto = (photo: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/photos/${photo}`,
   method: 'DELETE',
-  token
+  token: getToken()
 })
 
-export const deleteAlbum = (album: number, token: string) => io({
+export const deleteAlbum = (album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}`,
   method: 'DELETE',
-  token
+  token: getToken()
 })
 
 type IOOptions = {
