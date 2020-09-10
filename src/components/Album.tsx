@@ -1,18 +1,14 @@
 import React from 'react'
 import { SavedAlbum } from '../types'
 
-type Props = {
-  albums: SavedAlbum[]
-  onChange: (id: number) => void
+type Props = SavedAlbum & {
+  onSelect: (id: number) => void
 }
 
-const Album: React.FC<Props> = ({ albums, onChange }) =>
-  <select className="custom-select" onChange={e => onChange(+e.target.value)}>
-    {
-      albums.map(({ title, id }) =>
-        <option key={id} value={id}>{title}</option>
-      )
-    }
-  </select>
+const Album: React.FC<Props> = ({ onSelect, id, title }) =>
+  <div className="d-flex justify-content-between" onClick={() => onSelect(id)}>
+    <h5 className="mb-1">{title}</h5>
+    <small>{id}</small>
+  </div>
 
 export default Album

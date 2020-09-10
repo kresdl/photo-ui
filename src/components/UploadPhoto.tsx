@@ -3,13 +3,13 @@ import Field from './Field'
 import Submit from './Submit'
 import { uploadPhoto } from '../util'
 import { useNotify } from '../hooks'
-import styled from 'styled-components'
+import { SavedPhoto } from '../types'
 
-const Form = styled.form`
-  width: 20rem;
-`
+type Props = {
+  onUpload: (photo: SavedPhoto) => void
+}
 
-const UploadPhoto: React.FC = () => {
+const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
   const { notify } = useNotify()
   
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
@@ -25,20 +25,22 @@ const UploadPhoto: React.FC = () => {
     notify('Uploading photo...')
 
     try {
-      await uploadPhoto({ url, title, comment }, token)
+      const photo = await uploadPhoto({ url, title, comment }, token) as SavedPhoto
       notify('Upload successful!')
+      onUpload(photo)
+
     } catch (err) {
       notify(err)
     }
   }
 
   return (
-    <Form className="ml-5" onSubmit={submit}>
+    <form onSubmit={submit}>
       <Field>Title</Field>
       <Field>URL</Field>
       <Field optional id="comment">Comment (optional)</Field>
       <Submit>Upload photo</Submit>
-    </Form>
+    </form>
   )
 }
 

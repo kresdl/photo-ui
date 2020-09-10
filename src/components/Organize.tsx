@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Photos from './Photos'
-import Album from './Album'
+import Album from './AlbumSelect'
 import { useOrganizer, useNotify } from '../hooks'
 
 const Organize: React.FC = () => {

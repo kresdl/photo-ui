@@ -1,5 +1,8 @@
 import React from 'react'
 import { SavedPhoto } from '../types'
+import Photo from './Photo'
+import { TransitionGroup, Transition } from 'react-transition-group'
+import TransitionListItem from './TransitionListItem'
 
 type Props = {
   photos?: SavedPhoto[],
@@ -7,19 +10,19 @@ type Props = {
 }
 
 const Photos: React.FC<Props> = ({ photos, onSelect }) =>
-  <ul className="list-group">
+  <TransitionGroup as="ul" className="list-group">
     {
       photos?.map(photo =>
-        <li className="list-group-item list-group-item-action" key={photo.id} onClick={() => onSelect(photo)}>
-          <div className="d-flex justify-content-between">
-            <h5 className="mb-1">{photo.title}</h5>
-            <small>{photo.id}</small>
-          </div>
-          <p className="mb-1">{photo.comment}</p>
-          <small>{photo.url}</small>
-        </li>
+        <Transition key={photo.id} timeout={300}>
+          {
+            state =>
+              <TransitionListItem state={state}>
+                <Photo {...photo} onSelect={() => onSelect(photo)}/>
+              </TransitionListItem>
+          }
+        </Transition>
       )
     }
-  </ul>
+  </TransitionGroup>
 
 export default Photos
