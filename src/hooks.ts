@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { useContext, useCallback, useEffect } from 'react'
+import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
 import { Message, Album, Photo, Titled } from './types'
 import {
@@ -21,6 +21,18 @@ export const useNotify = () => {
       setMsg(msg ? m.concat(msg) : m)
     }, [setMsg])
   }
+}
+
+export const useRouteMessage = () => {
+  const { pathname, state } = useLocation<Message>()
+  const { msg, notify } = useNotify()
+
+  useLayoutEffect(
+    () => notify(state),
+    [pathname, state, notify]
+  )
+
+  return msg
 }
 
 export const useLogout = (path: string, redirect: string) => {
