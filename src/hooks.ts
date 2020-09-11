@@ -1,10 +1,13 @@
 /* eslint-disable no-throw-literal */
-import { useState, useContext, useCallback, useEffect, useLayoutEffect } from 'react'
+import { useContext, useCallback, useEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto, Album, Photo, Titled } from './types'
-import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, 
-  removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto } from './util'
+import { Message, Album, Photo, Titled } from './types'
+import {
+  downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
+  removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
+} from './util'
 import { useHistory, useLocation } from 'react-router-dom'
+import { useQuery, useMutation, queryCache } from 'react-query'
 
 const byTitle = (a: Titled, b: Titled) => a.title > b.title ? 1 : -1
 
@@ -13,24 +16,11 @@ export const useNotify = () => {
 
   return {
     msg,
-
     notify: useCallback((msg: Message) => {
       const m = [] as string[]
       setMsg(msg ? m.concat(msg) : m)
     }, [setMsg])
   }
-}
-
-export const useRouteMessage = () => {
-  const { pathname, state } = useLocation<Message>()
-  const { msg, notify } = useNotify()
-
-  useLayoutEffect(
-    () => notify(state),
-    [pathname, state, notify]
-  )
-
-  return msg
 }
 
 export const useLogout = (path: string, redirect: string) => {
@@ -45,102 +35,116 @@ export const useLogout = (path: string, redirect: string) => {
   }, [path, redirect, history, pathname])
 }
 
+
 export const usePhotos = () => {
-  const [photos, setPhotos] = useState<SavedPhoto[]>([])
+  const { notify } = useNotify()
 
-  return {
-    photos, setPhotos,
+  return useQuery('photos', async () => {
+    notify('Downloading photos...')
+    let photos = await downloadPhotos()
+    notify(null)
+    return photos.sort(byTitle)
+  }, { onError: (err: Message) => notify(err) })
+}
 
-    downloadPhotos: useCallback(async () => {
-      let dl = await downloadPhotos()
-      dl = dl.sort(byTitle)
-      setPhotos(dl)
-      return dl
-    }, [setPhotos]),
+export const useDeletePhoto = () => {
+  const { notify } = useNotify()
 
-    deletePhoto: useCallback(async (id: number) => {
-      await deletePhoto(id)
-      setPhotos(photos.filter(
-        photo => photo.id !== id
-      ))
-    }, [photos, setPhotos]),
+  return useMutation(async (id: number) => {
+    notify('Deleting photo...')
+    await deletePhoto(id)
+    notify(null)
+   }, {
+    onSuccess: () => queryCache.invalidateQueries('photos'),
+    onError: (err: Message) => notify(err) 
+  })
+}
 
-    uploadPhoto: useCallback(async (photo: Photo) => {
-      const saved = await uploadPhoto(photo) as SavedPhoto
-      setPhotos([...photos, saved].sort(byTitle))
-    }, [photos])
-  }
+export const useUploadPhoto = () => {
+  const { notify } = useNotify()
+
+  return useMutation(async (photo: Photo) => {
+    notify('Uploading photo...')
+    await uploadPhoto(photo)
+    notify(null)
+  }, {
+    onSuccess: () => queryCache.invalidateQueries('photos'),
+    onError: (err: Message) => notify(err)
+  })
 }
 
 export const useAlbums = () => {
-  const [albums, setAlbums] = useState<SavedAlbum[]>([])
+  const { notify } = useNotify()
 
-  return {
-    albums, setAlbums,
-
-    downloadAlbums: useCallback(async () => {
-      const dl = await downloadAlbums()
-      setAlbums(dl.sort(byTitle))
-      return dl
-    }, [setAlbums]),
-
-    deleteAlbum: useCallback(async (id: number) => {
-      await deleteAlbum(id)
-      setAlbums(albums.filter(
-        album => album.id !== id
-      ))
-    }, [albums]),
-
-    uploadAlbum: useCallback(async (album: Album) => {
-      const saved = await uploadAlbum(album) as SavedAlbum
-      setAlbums([...albums, saved].sort(byTitle))
-    }, [albums])
-  }
+  return useQuery('albums', async () => {
+    notify('Downloading albums...')
+    let albums = await downloadAlbums()
+    notify(null)
+    return albums.sort(byTitle)
+  }, { onError: (err: Message) => notify(err) })
 }
 
-export const useAlbum = () => {
-  const [album, setAlbum] = useState<SavedAlbum | null>(null)
+export const useDeleteAlbum = () => {
+  const { notify } = useNotify()
 
-  return {
-    album, setAlbum,
-
-    addPhoto: useCallback((photo: SavedPhoto) => {
-      setAlbum(album => album && {
-        ...album,
-        photos: [...album.photos!, photo].sort(byTitle)
-      })
-    }, []),
-
-    removePhoto: useCallback((id: number) => {
-      setAlbum(album => album && {
-        ...album,
-        photos: album.photos!.filter(photo => photo.id !== id)
-      })
-    }, [])
-  }
+  return useMutation(async (id: number) => {
+    notify('Deleting album...')
+    await deleteAlbum(id)
+    notify(null)
+   }, {
+    onSuccess: () => queryCache.invalidateQueries('albums'),
+    onError: (err: Message) => notify(err) 
+  })
 }
 
-export const useOrganizer = () => {
-  const { downloadPhotos, photos } = usePhotos(),
-    { downloadAlbums, albums } = useAlbums(),
-    { album, setAlbum, addPhoto, removePhoto } = useAlbum()
+export const useUploadAlbum = () => {
+  const { notify } = useNotify()
 
-  return {
-    photos, albums, album,
-    downloadPhotos, downloadAlbums,
+  return useMutation(async (album: Album) => {
+    notify('Uploading album...')
+    await uploadAlbum(album)
+    notify(null)
+  }, {
+    onSuccess: () => queryCache.invalidateQueries('albums'),
+    onError: (err: Message) => notify(err)
+  })
+}
 
-    cd: useCallback(async (id: number) => {
-      setAlbum(await downloadAlbum(id))
-    }, [setAlbum]),
+export const useAlbum = (id: number | null) => {
+  const { notify } = useNotify()
 
-    add: useCallback(async (photo: SavedPhoto) => {
-      await addPhotoToAlbum(photo.id, album!.id)
-      addPhoto(photo)
-    }, [addPhoto, album]),
+  return useQuery(['album', id], async (key: string, id: number | null) => {
+    if (id) {
+      notify('Downloading Album...')
+      const dl = await downloadAlbum(id)
+      notify(null)
+      return dl.photos.sort(byTitle)
+    }
+  }, { onError: (err: Message) => notify(err) })
+}
 
-    remove: useCallback(async (id: number) => {
-      await removePhotoFromAlbum(album!.id, id)
-      removePhoto(id)
-    }, [album, removePhoto])
-  }
+export const useAddPhoto = () => {
+  const { notify } = useNotify()
+
+  return useMutation(async ([photoId, albumId]: [number, number]) => {
+    notify('Adding photo to album...')
+    await addPhotoToAlbum(photoId, albumId)
+    notify(null)
+  }, {
+    onSuccess: () => queryCache.invalidateQueries('album'),
+    onError: (err: Message) => notify(err) 
+  })
+}
+
+export const useRemovePhoto = () => {
+  const { notify } = useNotify()
+
+  return useMutation(async ([photoId, albumId]: [number, number]) => {
+    notify('Removing photo from album...')
+    await removePhotoFromAlbum(photoId, albumId)
+    notify(null)
+  }, {
+    onSuccess: () => queryCache.invalidateQueries('album'),
+    onError: (err: Message) => notify(err)
+  })
 }

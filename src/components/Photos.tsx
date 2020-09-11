@@ -7,7 +7,7 @@ const TransitionList = transitionListFactory(Photo)
 
 type Props = {
   photos?: SavedPhoto[],
-  onSelect: (photo: SavedPhoto) => unknown
+  onSelect: (id: number) => unknown
 }
 
 const Photos: React.FC<Props> = ({ photos, onSelect }) =>

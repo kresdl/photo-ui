@@ -3,15 +3,15 @@ import { TransitionGroup, Transition } from 'react-transition-group'
 import TransitionListItem from './components/TransitionListItem'
 import { Saved } from './types'
 
-type SelectableItem<T> = {
-  onSelect: (item: T) => unknown
+type SelectableItem = {
+  onSelect: (id: number) => unknown
 }
 
-type ItemComp<T> = React.FC<T & SelectableItem<T>>
+type ItemComp<T> = React.FC<T & SelectableItem>
 
 type Props<T> = {
   items?: T[],
-  onSelect: (item: T) => unknown
+  onSelect: (id: number) => unknown
 }
 
 type Comp<T> = React.FC<Props<T>>
@@ -25,7 +25,7 @@ const transitionListFactory = <T extends Saved>(ItemComp: ItemComp<T>) =>
             {
               state =>
                 <TransitionListItem state={state}>
-                  <ItemComp {...item} onSelect={() => void onSelect(item)} />
+                  <ItemComp {...item} onSelect={() => void onSelect(item.id)} />
                 </TransitionListItem>
             }
           </Transition>

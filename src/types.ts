@@ -28,5 +28,5 @@ export type Register = Credentials & {
 export type SavedPhoto = Saved & Photo
 
 export type SavedAlbum = Saved & Album & {
-  photos?: SavedPhoto[]
+  photos: SavedPhoto[]
 }

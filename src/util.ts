@@ -63,7 +63,7 @@ export const addPhotoToAlbum = (photo: number, album: number) => io({
   token: getToken()
 })
 
-export const removePhotoFromAlbum = (album: number, photo: number) => io({
+export const removePhotoFromAlbum = (photo: number, album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
   method: 'DELETE',
   token: getToken()
