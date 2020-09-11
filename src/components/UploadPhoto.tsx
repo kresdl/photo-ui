@@ -24,7 +24,7 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
 
       try {
         await onUpload({ url, title, comment })
-        notify('Upload successful!')
+        notify(null)
         form.reset()
       } catch (err) {
         notify(err)

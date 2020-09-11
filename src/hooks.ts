@@ -23,12 +23,14 @@ export const useNotify = () => {
 
 export const useRouteMessage = () => {
   const { pathname, state } = useLocation<Message>()
-  const { notify } = useNotify()
+  const { msg, notify } = useNotify()
 
   useLayoutEffect(
     () => notify(state),
     [pathname, state, notify]
   )
+
+  return msg
 }
 
 export const useLogout = (path: string, redirect: string) => {

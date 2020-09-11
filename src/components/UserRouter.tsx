@@ -4,7 +4,7 @@ import PhotoEditor from './PhotoEditor'
 import AlbumEditor from './AlbumEditor'
 import Organize from './Organize'
 
-const Panel: React.FC = () =>
+const UserRouter: React.FC = () =>
   <Switch>
     <Route path="/user/organize">
       <Organize />
@@ -17,4 +17,4 @@ const Panel: React.FC = () =>
     </Route>
   </Switch>
 
-export default Panel
+export default UserRouter

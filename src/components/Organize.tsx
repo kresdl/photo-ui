@@ -13,11 +13,15 @@ const Organize: React.FC = () => {
     notify('Downloading photos...')
 
     try {
-      await downloadPhotos()
+      const pt = await downloadPhotos()
+      if (!pt.length) return notify('No photos')
       notify('Downloading albums...')
-      const temp = await downloadAlbums()
+
+      const ta = await downloadAlbums()
+      if (!ta.length) return notify('No albums')
       notify('Downloading album...')
-      await cd(temp[0].id)
+
+      await cd(ta[0].id)
       notify(null)
     } catch (err) {
       notify(err)

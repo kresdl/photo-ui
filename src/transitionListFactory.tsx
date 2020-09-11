@@ -7,12 +7,16 @@ type SelectableItem<T> = {
   onSelect: (item: T) => unknown
 }
 
+type ItemComp<T> = React.FC<T & SelectableItem<T>>
+
 type Props<T> = {
   items?: T[],
   onSelect: (item: T) => unknown
 }
 
-const transitionListFactory = <T extends Saved>(Component: React.FC<T & SelectableItem<T>>) =>
+type Comp<T> = React.FC<Props<T>>
+
+const transitionListFactory = <T extends Saved>(ItemComp: ItemComp<T>) =>
   (({ items, onSelect }) =>
     <TransitionGroup as="ul" className="list-group">
       {
@@ -21,14 +25,15 @@ const transitionListFactory = <T extends Saved>(Component: React.FC<T & Selectab
             {
               state =>
                 <TransitionListItem state={state}>
-                  <Component {...item} onSelect={() => void onSelect(item)} />
+                  <ItemComp {...item} onSelect={() => void onSelect(item)} />
                 </TransitionListItem>
             }
           </Transition>
         )
       }
     </TransitionGroup>
-  ) as React.FC<Props<T>>
+
+  ) as Comp<T>
 
 
 export default transitionListFactory

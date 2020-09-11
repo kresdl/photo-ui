@@ -14,14 +14,15 @@ const animate = {
 }
 
 const TransitionListItem: React.FC<Props> = ({ state, children }) => {
-  const styles = useRef<TransitionStyles | null>(null),
-    style = styles.current?.[state],
+  const styles = useRef<TransitionStyles | null>(null)
+  const props = {
+    style: styles.current?.[state],
 
-    ref: React.RefCallback<HTMLLIElement> = em => {
+    ref(em: HTMLLIElement) {
       if (!em) return
 
       // Negative bottom margin to emulate collapsing behavior and shift content below upwards.
-      const marginBottom = -em.clientHeight 
+      const marginBottom = -em.clientHeight
 
       styles.current = {
         entering: { opacity: 0, marginBottom },
@@ -30,13 +31,14 @@ const TransitionListItem: React.FC<Props> = ({ state, children }) => {
         exited: { opacity: 0, marginBottom }
       }
     }
+  }
 
   // On <Li/> mount, get client height and create
   // transition-state/styling pairs to index into.
   // styled-system allows for styles to be passed   as props.
 
   return (
-    <li className="list-group-item list-group-item-action" ref={ref} style={style}>
+    <li className="list-group-item list-group-item-action" {...props}>
       {children}
     </li>
   )

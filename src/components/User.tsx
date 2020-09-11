@@ -1,6 +1,6 @@
 import React from 'react'
 import Sidebar from './Sidebar'
-import Panel from './Panel'
+import UserRouter from './UserRouter'
 
 const User: React.FC = () =>
   <div className="row no-gutters vh-100">
@@ -9,7 +9,7 @@ const User: React.FC = () =>
     </header>
     <main className="col">
       <div className="pt-5 px-5">
-        <Panel />
+        <UserRouter />
       </div>
     </main>
   </div>

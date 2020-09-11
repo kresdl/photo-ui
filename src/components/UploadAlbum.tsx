@@ -21,7 +21,7 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
 
     try {
       await onUpload({ title })
-      notify('Upload successful!')
+      notify(null)
       form.reset()
     } catch (err) {
       notify(err)
