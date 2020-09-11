@@ -14,7 +14,7 @@ const AlbumEditor: React.FC = () => {
 
     try {
       await deleteAlbum(id)
-      notify('Album deleted!')
+      notify(null)
     } catch (err) {
       notify(err)
     }    

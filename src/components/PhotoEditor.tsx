@@ -14,7 +14,7 @@ const PhotoEditor: React.FC = () => {
 
     try {
       await deletePhoto(id)
-      notify('Photo deleted!')
+      notify(null)
     } catch (err) {
       notify(err)
     }

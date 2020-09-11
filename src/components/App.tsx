@@ -7,7 +7,7 @@ const App: React.FC = () => {
 
   return (
     <Ctx.Provider value={messaging}>
-      <div className="container-fluid">
+      <div className="container-fluid p-0">
         <Router />
       </div>
     </Ctx.Provider>

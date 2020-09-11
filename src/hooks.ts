@@ -1,12 +1,12 @@
 /* eslint-disable no-throw-literal */
 import { useState, useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto, Album, Photo, Title } from './types'
+import { Message, SavedAlbum, SavedPhoto, Album, Photo, Titled } from './types'
 import { downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum, 
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
 
-const byTitle = (a: Title, b: Title) => a.title > b.title ? 1 : -1
+const byTitle = (a: Titled, b: Titled) => a.title > b.title ? 1 : -1
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!

@@ -1,19 +1,19 @@
 export type Message = string[] | string | null | undefined
 
-export type Id = { 
+export type Saved = { 
   id: number
 }
 
-export type Title = {
+export type Titled = {
   title: string
 }
 
-export type Photo = Title & {
+export type Photo = Titled & {
   url: string,
   comment?: string
 }
 
-export type Album = Title
+export type Album = Titled
 
 export type Credentials = {
   email: string,
@@ -25,8 +25,8 @@ export type Register = Credentials & {
   last_name: string
 }
 
-export type SavedPhoto = Id & Photo
+export type SavedPhoto = Saved & Photo
 
-export type SavedAlbum = Id & Album & {
+export type SavedAlbum = Saved & Album & {
   photos?: SavedPhoto[]
 }
