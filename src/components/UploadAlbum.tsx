@@ -17,11 +17,8 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
     const form = e.target as HTMLFormElement
     const { value: title } = form.elements.namedItem('title') as HTMLInputElement
 
-    notify('Uploading album...')
-
     try {
       await onUpload({ title })
-      notify(null)
       form.reset()
     } catch (err) {
       notify(err)

@@ -13,7 +13,7 @@ const Splash: React.FC = () => {
   return (
     <Center className="mx-auto pt-5">
       <SplashRouter />
-      <p className="p-3">{msg}</p>
+      <p className="pt-3">{msg}</p>
     </Center>
   )
 }

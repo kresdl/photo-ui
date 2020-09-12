@@ -1,11 +1,12 @@
 import React from 'react'
 import UploadPhoto from './UploadPhoto'
 import Photos from './Photos'
+import { byTitle } from '../util'
 import { usePhotos, useDeletePhoto, useUploadPhoto, useNotify } from '../hooks'
 
 const PhotoEditor: React.FC = () => {
   const { msg } = useNotify(),
-    photos = usePhotos(),
+    photos = usePhotos()?.sort(byTitle),
     deletePhoto = useDeletePhoto(),
     uploadPhoto = useUploadPhoto()
 

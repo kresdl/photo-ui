@@ -1,11 +1,12 @@
 import React from 'react'
 import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
+import { byTitle } from '../util'
 import { useAlbums, useDeleteAlbum, useNotify, useUploadAlbum } from '../hooks'
 
 const AlbumEditor: React.FC = () => {
   const { msg } = useNotify(),
-    albums = useAlbums(),
+    albums = useAlbums()?.sort(byTitle),
     deleteAlbum = useDeleteAlbum(),
     uploadAlbum = useUploadAlbum()
 

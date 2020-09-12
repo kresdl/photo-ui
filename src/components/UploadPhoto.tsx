@@ -20,11 +20,8 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       { value: title } = elements.namedItem('title') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
-      notify('Uploading photo...')
-
       try {
         await onUpload({ url, title, comment })
-        notify(null)
         form.reset()
       } catch (err) {
         notify(err)
