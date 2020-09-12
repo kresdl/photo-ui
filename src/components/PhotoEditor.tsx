@@ -5,9 +5,9 @@ import { usePhotos, useDeletePhoto, useUploadPhoto, useNotify } from '../hooks'
 
 const PhotoEditor: React.FC = () => {
   const { msg } = useNotify(),
-    { data } = usePhotos(),
-    [deletePhoto] = useDeletePhoto(),
-    [uploadPhoto] = useUploadPhoto()
+    photos = usePhotos(),
+    deletePhoto = useDeletePhoto(),
+    uploadPhoto = useUploadPhoto()
 
   return (
     <div className="row">
@@ -17,7 +17,7 @@ const PhotoEditor: React.FC = () => {
       </div>
       <div className="col-6">
         <h5 className="mb-3">Photos</h5>
-        <Photos photos={data} onSelect={deletePhoto} />
+        <Photos photos={photos} onSelect={deletePhoto} />
       </div>
     </div>
   )

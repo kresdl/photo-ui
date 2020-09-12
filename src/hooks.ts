@@ -1,7 +1,7 @@
 /* eslint-disable no-throw-literal */
 import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, Album, Photo, Titled } from './types'
+import { Message, Titled } from './types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
@@ -47,116 +47,66 @@ export const useLogout = (path: string, redirect: string) => {
   }, [path, redirect, history, pathname])
 }
 
-
-export const usePhotos = () => {
+const usePeek = <T>(key: string, msg: string, task: () => Promise<T[]>) => {
   const { notify } = useNotify()
 
-  return useQuery('photos', async () => {
-    notify('Downloading photos...')
-    let photos = await downloadPhotos()
+  return useQuery(key, async () => {
+    notify(msg)
+    let items = await task()
     notify(null)
-    return photos.sort(byTitle)
+    return items
   }, { onError: (err: Message) => notify(err) })
 }
 
-export const useDeletePhoto = () => {
+const useIndexedPeek = <T>(key: string, index: any, msg: string, task: (id: number) => Promise<T>) => {
   const { notify } = useNotify()
 
-  return useMutation(async (id: number) => {
-    notify('Deleting photo...')
-    await deletePhoto(id)
-    notify(null)
-   }, {
-    onSuccess: () => queryCache.invalidateQueries('photos'),
-    onError: (err: Message) => notify(err) 
-  })
-}
-
-export const useUploadPhoto = () => {
-  const { notify } = useNotify()
-
-  return useMutation(async (photo: Photo) => {
-    notify('Uploading photo...')
-    await uploadPhoto(photo)
-    notify(null)
-  }, {
-    onSuccess: () => queryCache.invalidateQueries('photos'),
-    onError: (err: Message) => notify(err)
-  })
-}
-
-export const useAlbums = () => {
-  const { notify } = useNotify()
-
-  return useQuery('albums', async () => {
-    notify('Downloading albums...')
-    let albums = await downloadAlbums()
-    notify(null)
-    return albums.sort(byTitle)
-  }, { onError: (err: Message) => notify(err) })
-}
-
-export const useDeleteAlbum = () => {
-  const { notify } = useNotify()
-
-  return useMutation(async (id: number) => {
-    notify('Deleting album...')
-    await deleteAlbum(id)
-    notify(null)
-   }, {
-    onSuccess: () => queryCache.invalidateQueries('albums'),
-    onError: (err: Message) => notify(err) 
-  })
-}
-
-export const useUploadAlbum = () => {
-  const { notify } = useNotify()
-
-  return useMutation(async (album: Album) => {
-    notify('Uploading album...')
-    await uploadAlbum(album)
-    notify(null)
-  }, {
-    onSuccess: () => queryCache.invalidateQueries('albums'),
-    onError: (err: Message) => notify(err)
-  })
-}
-
-export const useAlbum = (id: number | null) => {
-  const { notify } = useNotify()
-
-  return useQuery(['album', id], async (key: string, id: number | null) => {
-    if (id) {
-      notify('Downloading Album...')
-      const dl = await downloadAlbum(id)
+  return useQuery([key, index], async (key: string, index: any) => {
+    if (index) {
+      notify(msg)
+      const dl = await task(index)
       notify(null)
-      return dl.photos.sort(byTitle)
+      return dl
     }
   }, { onError: (err: Message) => notify(err) })
 }
 
-export const useAddPhoto = () => {
+const usePoke = (key: string, msg: string, task: (...args: any) => Promise<any>) => {
   const { notify } = useNotify()
 
-  return useMutation(async ([photoId, albumId]: [number, number]) => {
-    notify('Adding photo to album...')
-    await addPhotoToAlbum(photoId, albumId)
+  return useMutation(async ([...args]: any) => {
+    notify(msg)
+    await task(...args)
     notify(null)
   }, {
-    onSuccess: () => queryCache.invalidateQueries('album'),
+    onSuccess: () => queryCache.invalidateQueries(key),
     onError: (err: Message) => notify(err) 
   })
 }
 
-export const useRemovePhoto = () => {
-  const { notify } = useNotify()
+export const usePhotos = () =>
+  usePeek('photos', 'Downloading photos...', downloadPhotos).data
 
-  return useMutation(async ([photoId, albumId]: [number, number]) => {
-    notify('Removing photo from album...')
-    await removePhotoFromAlbum(photoId, albumId)
-    notify(null)
-  }, {
-    onSuccess: () => queryCache.invalidateQueries('album'),
-    onError: (err: Message) => notify(err)
-  })
-}
+export const useDeletePhoto = () =>   
+  usePoke('photos', 'Deleting photo...', deletePhoto)[0]
+
+export const useUploadPhoto = () =>
+  usePoke('photos', 'Uploading photo...', uploadPhoto)[0]
+
+export const useAlbums = () => 
+  usePeek('albums', 'Downloading albums...', downloadAlbums).data
+
+export const useDeleteAlbum = () =>
+  usePoke('albums', 'Deleting album...', deleteAlbum)[0]
+
+export const useUploadAlbum = () =>
+  usePoke('albums', 'Uploading album...', uploadAlbum)[0]
+
+export const useAlbum = (id: number | null) => 
+  useIndexedPeek('album', id, 'Downloading Album...', downloadAlbum).data
+
+export const useAddPhoto = () => 
+  usePoke('album', 'Adding photo to album...', addPhotoToAlbum)[0]
+
+export const useRemovePhoto = () => 
+  usePoke('album', 'Removing photo from album...', removePhotoFromAlbum)[0]

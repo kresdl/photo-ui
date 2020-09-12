@@ -5,9 +5,9 @@ import { useAlbums, useDeleteAlbum, useNotify, useUploadAlbum } from '../hooks'
 
 const AlbumEditor: React.FC = () => {
   const { msg } = useNotify(),
-    { data } = useAlbums(),
-    [deleteAlbum] = useDeleteAlbum(),
-    [uploadAlbum] = useUploadAlbum()
+    albums = useAlbums(),
+    deleteAlbum = useDeleteAlbum(),
+    uploadAlbum = useUploadAlbum()
 
   return (
     <div className="row">
@@ -17,7 +17,7 @@ const AlbumEditor: React.FC = () => {
       </div>
       <div className="col-6">
         <h5 className="mb-3">Albums</h5>
-        <Albums albums={data} onSelect={deleteAlbum} />
+        <Albums albums={albums} onSelect={deleteAlbum} />
       </div>
     </div>
   )

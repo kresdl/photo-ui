@@ -7,11 +7,11 @@ const Organize: React.FC = () => {
   const { msg } = useNotify()
   const [albumId, setAlbumId] = useState<number | null>(null)
 
-  const { data: photos } = usePhotos(),
-    { data: albums } = useAlbums(),
-    { data: album } = useAlbum(albumId),
-    [addPhoto] = useAddPhoto(),
-    [removePhoto] = useRemovePhoto()
+  const photos = usePhotos(),
+    albums = useAlbums(),
+    album = useAlbum(albumId),
+    addPhoto = useAddPhoto(),
+    removePhoto = useRemovePhoto()
 
   useEffect(() => {
     albums?.length && setAlbumId(albums[0].id)
@@ -37,7 +37,7 @@ const Organize: React.FC = () => {
               <AlbumSelect albums={albums!} onChange={setAlbumId} />
             </div>
             <div key={albumId}>
-              <Photos photos={album} onSelect={id => removePhoto([id, albumId!])} />
+              <Photos photos={album!.photos} onSelect={id => removePhoto([id, albumId!])} />
             </div>
           </>
         }
