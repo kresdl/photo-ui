@@ -50,7 +50,7 @@ const Organize: React.FC = () => {
       <div className="col-6">
         <h5 className="mb-3">Photos</h5>
         {
-          ready && <Photos photos={photos} onSelect={id =>{ reset(); addPhoto(id, albumId!); }} />
+          ready && <Photos photos={photos} onSelect={id => addPhoto(id, albumId!)} />
         }
         <div className="pt-3">
           {
