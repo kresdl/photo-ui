@@ -1,13 +1,13 @@
 /* eslint-disable no-throw-literal */
 import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message } from './types'
+import { Message, SavedAlbum, SavedPhoto } from './types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
 } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
-import { useQuery, useMutation, queryCache } from 'react-query'
+import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!
@@ -45,68 +45,91 @@ export const useLogout = (path: string, redirect: string) => {
   }, [path, redirect, history, pathname])
 }
 
-const useSync = <T>(key: string, msg: string, task: () => Promise<T[]>) => {
-  const { notify } = useNotify()
+type StatusMsg = Partial<Record<QueryStatus, string>>
 
-  return useQuery(key, async () => {
-    notify(msg)
-    let items = await task()
-    notify(null)
-    return items
-  }, { onError: (err: Message) => notify(err) }).data
+const useSync = <T>(
+  key: string,
+  msg: StatusMsg,
+  task: () => Promise<T[]>,
+  config?: QueryConfig<T[], string>
+) => {
+  const { data, error, status, ...rest } = useQuery(key, task, config)
+
+  return {
+    ...rest,
+    data,
+    error: error as string,
+    msg: msg[status]
+  }
 }
 
-const useIndexedSync = <T>(key: string, index: any, msg: string, task: (id: number) => Promise<T>) => {
-  const { notify } = useNotify()
+const useIndexedSync = <T>(
+  key: string,
+  index: any,
+  msg: StatusMsg, 
+  task: (id: number) => Promise<T>,
+  config?: QueryConfig<T, string>
+) => {
+  const { data, error, status, ...rest } = useQuery(
+    [key, index],
+    (key: string, index: any) => index && task(index),
+    config
+  )
 
-  return useQuery([key, index], async (key: string, index: any) => {
-    if (index) {
-      notify(msg)
-      const dl = await task(index)
-      notify(null)
-      return dl
+  return {
+    ...rest,
+    data,
+    error: error as string,
+    msg: msg[status]
+  }
+}
+
+const useMutate = (
+  key: string,
+  msg: StatusMsg,
+  task: (...args: any) => Promise<any>,
+  config?: MutationConfig<any, string>
+) => {
+  const [mutate, { error, status, ...rest }] = useMutation(
+    (args: any[]) => task(...args),
+    {
+      onSuccess: () => queryCache.invalidateQueries(key),
+      throwOnError: true,
+      ...config
     }
-  }, { onError: (err: Message) => notify(err) }).data
+  )
+
+  return {
+    ...rest,
+    mutate: (...args: any[]) => mutate(args),
+    msg: msg[status],
+    error: error as string,
+  }
 }
 
-const useMutate = (key: string, msg: string, task: (...args: any[]) => Promise<any>) => {
-  const { notify } = useNotify()
+export const usePhotos = (config?: QueryConfig<SavedPhoto[], string>) =>
+  useSync('photos', { loading: 'Downloading photos...' }, downloadPhotos, config)
 
-  const [mutate] = useMutation(async (args: any[]) => {
-    notify(msg)
-    await task(...args)
-    notify(null)
-  }, {
-    onSuccess: () => queryCache.invalidateQueries(key),
-    onError: (err: Message) => notify(err) 
-  })
+export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
+  useMutate('photos', { loading: 'Deleting photo...' }, deletePhoto, config)
 
-  return (...args: any[]) => mutate(args)
-}
+export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
+  useMutate('photos', { loading: 'Uploading photo...' }, uploadPhoto, config)
 
-export const usePhotos = () =>
-  useSync('photos', 'Downloading photos...', downloadPhotos)
+export const useAlbums = (config?: QueryConfig<SavedAlbum[], string>) =>
+  useSync('albums', { loading: 'Downloading albums...' }, downloadAlbums, config)
 
-export const useDeletePhoto = () =>   
-  useMutate('photos', 'Deleting photo...', deletePhoto)
+export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
+  useMutate('albums', { loading: 'Deleting album...' }, deleteAlbum, config)
 
-export const useUploadPhoto = () =>
-  useMutate('photos', 'Uploading photo...', uploadPhoto)
+export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
+  useMutate('albums', { loading: 'Uploading album...' }, uploadAlbum, config)
 
-export const useAlbums = () => 
-  useSync('albums', 'Downloading albums...', downloadAlbums)
+export const useAlbum = (id: number | null | undefined, config?: QueryConfig<SavedAlbum, string>) =>
+  useIndexedSync('album', id, { loading: 'Downloading album...' }, downloadAlbum, config)
 
-export const useDeleteAlbum = () =>
-  useMutate('albums', 'Deleting album...', deleteAlbum)
+export const useAddPhoto = (config?: MutationConfig<unknown, string>) =>
+  useMutate('album', { loading: 'Adding photo to album...' }, addPhotoToAlbum, config)
 
-export const useUploadAlbum = () =>
-  useMutate('albums', 'Uploading album...', uploadAlbum)
-
-export const useAlbum = (id: number | null) => 
-  useIndexedSync('album', id, 'Downloading Album...', downloadAlbum)
-
-export const useAddPhoto = () => 
-  useMutate('album', 'Adding photo to album...', addPhotoToAlbum)
-
-export const useRemovePhoto = () => 
-  useMutate('album', 'Removing photo from album...', removePhotoFromAlbum)
+export const useRemovePhoto = (config?: MutationConfig<unknown, string>) =>
+  useMutate('album', { loading: 'Removing photo from album...' }, removePhotoFromAlbum, config)

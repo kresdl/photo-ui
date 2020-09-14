@@ -2,15 +2,12 @@ import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
 import { Album } from '../types'
-import { useNotify } from '../hooks'
 
 type Props = {
   onUpload: (album: Album) => Promise<void>
 }
 
 const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
-  const { notify } = useNotify()
-
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
 
@@ -20,9 +17,7 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
     try {
       await onUpload({ title })
       form.reset()
-    } catch (err) {
-      notify(err)
-    }
+    } catch {}
   }
 
   return (

@@ -1,33 +1,64 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Photos from './Photos'
 import AlbumSelect from './AlbumSelect'
 import { byTitle } from '../util'
-import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto, useNotify } from '../hooks'
+import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../hooks'
+import { useErrorResetBoundary } from 'react-query'
 
 const Organize: React.FC = () => {
-  const { msg } = useNotify()
   const [albumId, setAlbumId] = useState<number | null>(null)
+  const { reset } = useErrorResetBoundary()
 
-  const photos = usePhotos()?.sort(byTitle),
-    albums = useAlbums()?.sort(byTitle),
-    album = useAlbum(albumId)?.photos.sort(byTitle),
-    addPhoto = useAddPhoto(),
-    removePhoto = useRemovePhoto()
+  const {
+    data: photos,
+    msg: photosMsg,
+    error: photosErr
+  } = usePhotos()
+
+  const {
+    data: albums,
+    msg: albumsMsg,
+    error: albumsErr
+  } = useAlbums()
+
+  const {
+    data: album,
+    msg: albumMsg,
+    error: albumErr
+  } = useAlbum(albumId)
+
+  const {
+    mutate: addPhoto,
+    msg: addMsg,
+    error: addErr
+  } = useAddPhoto()
+
+  const {
+    mutate: removePhoto,
+    msg: removeMsg,
+    error: removeErr
+  } = useRemovePhoto()
 
   useEffect(() => {
     albums?.length && setAlbumId(albums[0].id)
   }, [albums])
 
-  const ready = (albums?.length && photos?.length && album) || null
+  const ready = (photos?.length && album) || null
 
   return (
     <div className="row">
       <div className="col-6">
         <h5 className="mb-3">Photos</h5>
         {
-          ready && <Photos photos={photos} onSelect={id => addPhoto(id, albumId!)} />
+          ready && <Photos photos={photos} onSelect={id =>{ reset(); addPhoto(id, albumId!); }} />
         }
-        <p className="pt-3">{msg}</p>
+        <div className="pt-3">
+          {
+            [photosMsg, albumsMsg, albumMsg, addMsg, removeMsg,
+              albumsErr, photosErr, albumErr, addErr, removeErr]
+              .map(msg => msg && <p key={msg}>{msg}</p>)
+          }
+        </div>
       </div>
       <div className="col-6">
         <h5 className="mb-3">Album</h5>
@@ -38,7 +69,7 @@ const Organize: React.FC = () => {
               <AlbumSelect albums={albums!} onChange={setAlbumId} />
             </div>
             <div key={albumId}>
-              <Photos photos={album} onSelect={id => removePhoto(id, albumId!)} />
+              <Photos photos={album?.photos.sort(byTitle)} onSelect={id => removePhoto(id, albumId!)} />
             </div>
           </>
         }

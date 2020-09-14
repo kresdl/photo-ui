@@ -2,15 +2,12 @@ import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
 import { Photo } from '../types'
-import { useNotify } from '../hooks'
 
 type Props = {
   onUpload: (photo: Photo) => Promise<void>
 }
 
 const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
-  const { notify } = useNotify()
-  
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
 
@@ -20,12 +17,10 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       { value: title } = elements.namedItem('title') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
-      try {
-        await onUpload({ url, title, comment })
-        form.reset()
-      } catch (err) {
-        notify(err)
-      }
+    try {
+      await onUpload({ url, title, comment })
+      form.reset()
+    } catch {}
   }
 
   return (
