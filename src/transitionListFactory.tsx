@@ -1,31 +1,31 @@
-import React from 'react'
+import React, { HTMLProps } from 'react'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import TransitionListItem from './components/TransitionListItem'
 import { Saved } from './types'
 
-type SelectableItem = {
+type Selectable = {
   onSelect: (id: number) => unknown
 }
 
-type ItemComp<T> = React.FC<T & SelectableItem>
+type Fragment<T> = React.FC<T & Selectable>
 
-type Props<T> = {
-  items?: T[],
-  onSelect: (id: number) => unknown
+type Props<T, S> = HTMLProps<Pick<HTMLElementTagNameMap, S>> & Selectable & {
+  as: S,
+  items?: T[]
 }
 
-type Comp<T> = React.FC<Props<T>>
+type Comp<T, S> = React.FC<Props<T, S>>
 
-const transitionListFactory = <T extends Saved>(ItemComp: ItemComp<T>) =>
-  (({ items, onSelect }) =>
-    <TransitionGroup as="ul" className="list-group">
+const transitionListFactory = <T extends Saved, S extends keyof HTMLElementTagNameMap>(Fragment: Fragment<T>) =>
+  (({ items, onSelect, ...rest }) =>
+    <TransitionGroup className="list-group" {...rest} >
       {
         items?.map(item =>
           <Transition key={item.id} timeout={300}>
             {
               state =>
                 <TransitionListItem state={state}>
-                  <ItemComp {...item} onSelect={() => void onSelect(item.id)} />
+                  <Fragment {...item} onSelect={() => void onSelect(item.id)} />
                 </TransitionListItem>
             }
           </Transition>
@@ -33,7 +33,6 @@ const transitionListFactory = <T extends Saved>(ItemComp: ItemComp<T>) =>
       }
     </TransitionGroup>
 
-  ) as Comp<T>
-
+  ) as Comp<T, S>
 
 export default transitionListFactory

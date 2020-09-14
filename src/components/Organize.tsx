@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Photos from './Photos'
 import AlbumSelect from './AlbumSelect'
 import { byTitle } from '../util'
 import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../hooks'
-import { useErrorResetBoundary } from 'react-query'
 
 const Organize: React.FC = () => {
-  const [albumId, setAlbumId] = useState<number | null>(null)
-  const { reset } = useErrorResetBoundary()
+  const reset = () => {
+    addErr && resetAdd()
+    removeErr && resetRemove()
+  }
+
+  const [albumId, setAlbumId] = useState<number | undefined>()
 
   const {
     data: photos,
@@ -30,27 +33,45 @@ const Organize: React.FC = () => {
   const {
     mutate: addPhoto,
     msg: addMsg,
-    error: addErr
+    error: addErr,
+    reset: resetAdd
   } = useAddPhoto()
 
   const {
     mutate: removePhoto,
     msg: removeMsg,
-    error: removeErr
+    error: removeErr,
+    reset: resetRemove
   } = useRemovePhoto()
 
   useEffect(() => {
     albums?.length && setAlbumId(albums[0].id)
   }, [albums])
 
-  const ready = (photos?.length && album) || null
+  const change = (id: number) => {
+    reset()
+    setAlbumId(id)
+  }
+
+  const add = (id: number) => {
+    reset()
+    addPhoto(id, albumId!)
+  }
+
+  const remove = (id: number) => {
+    reset()
+    removePhoto(id, albumId!)
+  }
+
+  const ready = (photos?.length && albums?.length) || null
 
   return (
     <div className="row">
       <div className="col-6">
         <h5 className="mb-3">Photos</h5>
         {
-          ready && <Photos photos={photos} onSelect={id => addPhoto(id, albumId!)} />
+          ready &&
+          <Photos items={photos} onSelect={add} />
         }
         <div className="pt-3">
           {
@@ -66,10 +87,10 @@ const Organize: React.FC = () => {
           ready &&
           <>
             <div className="mb-3">
-              <AlbumSelect albums={albums!} onChange={setAlbumId} />
+              <AlbumSelect albums={albums} onChange={change} selected={albumId} />
             </div>
             <div key={albumId}>
-              <Photos photos={album?.photos.sort(byTitle)} onSelect={id => removePhoto(id, albumId!)} />
+              <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
             </div>
           </>
         }

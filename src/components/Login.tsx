@@ -4,6 +4,7 @@ import Submit from './Submit'
 import { Link, useHistory } from 'react-router-dom'
 import { login } from '../util'
 import { useNotify } from '../hooks'
+import { queryCache } from 'react-query'
 
 const Login: React.FC = () => {
   const history = useHistory()
@@ -20,6 +21,7 @@ const Login: React.FC = () => {
     try {
       const token = await login({ email, password }) as string
       sessionStorage.setItem('token', token)
+      queryCache.clear()
       history.push('/user')
     } catch (err) {
       notify(err)

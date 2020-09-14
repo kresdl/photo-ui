@@ -3,8 +3,14 @@ import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
 import { byTitle } from '../util'
 import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../hooks'
+import { Album } from '../types'
 
 const AlbumEditor: React.FC = () => {
+  const reset = () => {
+    uploadErr && resetUpload()
+    deleteErr && resetDelete()
+  }
+
   const {
     data: albums,
     msg: loadMsg,
@@ -14,19 +20,31 @@ const AlbumEditor: React.FC = () => {
   const {
     mutate: deleteAlbum,
     msg: deleteMsg,
-    error: deleteErr
+    error: deleteErr,
+    reset: resetDelete
   } = useDeleteAlbum()
 
   const {
     mutate: uploadAlbum,
     msg: uploadMsg,
-    error: uploadErr
-  } = useUploadAlbum()
+    error: uploadErr,
+    reset: resetUpload
+  } = useUploadAlbum({ throwOnError: true })
+
+  const upload = (album: Album) => {
+    reset()
+    return uploadAlbum(album)
+  }
+
+  const discard = (id: number) => {
+    reset()
+    deleteAlbum(id)
+  }
 
   return (
     <div className="row">
       <div className="col-6">
-        <UploadAlbum onUpload={uploadAlbum} />
+        <UploadAlbum onUpload={upload} />
         <div className="pt-3">
           {
             [loadMsg, deleteMsg, uploadMsg,
@@ -37,7 +55,7 @@ const AlbumEditor: React.FC = () => {
       </div>
       <div className="col-6">
         <h5 className="mb-3">Albums</h5>
-        <Albums albums={albums?.sort(byTitle)} onSelect={deleteAlbum} />
+        <Albums items={albums?.sort(byTitle)} onSelect={discard} />
       </div>
     </div>
   )

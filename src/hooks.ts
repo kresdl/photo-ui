@@ -40,6 +40,7 @@ export const useLogout = (path: string, redirect: string) => {
   useEffect(() => {
     if (pathname === path) {
       sessionStorage.removeItem('token')
+      queryCache.clear()
       history.push(redirect)
     }
   }, [path, redirect, history, pathname])
@@ -50,17 +51,12 @@ type StatusMsg = Partial<Record<QueryStatus, string>>
 const useSync = <T>(
   key: string,
   msg: StatusMsg,
-  task: () => Promise<T[]>,
-  config?: QueryConfig<T[], string>
+  task: () => Promise<T>,
+  config?: QueryConfig<T, string>
 ) => {
-  const { data, error, status, ...rest } = useQuery(key, task, config)
+  const { status, ...rest } = useQuery(key, task, config)
 
-  return {
-    ...rest,
-    data,
-    error: error as string,
-    msg: msg[status]
-  }
+  return { ...rest, status, msg: msg[status] }
 }
 
 const useIndexedSync = <T>(
@@ -70,18 +66,13 @@ const useIndexedSync = <T>(
   task: (id: number) => Promise<T>,
   config?: QueryConfig<T, string>
 ) => {
-  const { data, error, status, ...rest } = useQuery(
+  const { status, ...rest } = useQuery(
     [key, index],
     (key: string, index: any) => index && task(index),
     config
   )
 
-  return {
-    ...rest,
-    data,
-    error: error as string,
-    msg: msg[status]
-  }
+  return { ...rest, status, msg: msg[status] }
 }
 
 const useMutate = (
@@ -90,20 +81,18 @@ const useMutate = (
   task: (...args: any) => Promise<any>,
   config?: MutationConfig<any, string>
 ) => {
-  const [mutate, { error, status, ...rest }] = useMutation(
+  const [mutate, { status, ...rest }] = useMutation(
     (args: any[]) => task(...args),
     {
       onSuccess: () => queryCache.invalidateQueries(key),
-      throwOnError: true,
       ...config
     }
   )
 
   return {
-    ...rest,
+    ...rest, status,
     mutate: (...args: any[]) => mutate(args),
     msg: msg[status],
-    error: error as string,
   }
 }
 

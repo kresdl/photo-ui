@@ -22,7 +22,7 @@ const TransitionListItem: React.FC<Props> = ({ state, children }) => {
       if (!em) return
 
       // Negative bottom margin to emulate collapsing/expanding behavior and shift content below upwards/downwards.
-      const marginBottom = -em.clientHeight
+      const marginBottom = -em.clientHeight - 1
 
       styles.current = {
         entering: { opacity: 0, marginBottom },

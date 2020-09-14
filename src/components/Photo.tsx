@@ -11,7 +11,7 @@ const Photo: React.FC<Props> = ({ onSelect, id, title, url, comment }) =>
       <h5 className="mb-1">{title}</h5>
       <small>{id}</small>
     </div>
-    <p className="mb-1">{comment}</p>
+    <p style={{ fontSize: '1.1rem' }} className="mb-1 lead">{comment}</p>
     <small>{url}</small>
   </div>
 
