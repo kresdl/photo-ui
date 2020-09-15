@@ -1,19 +1,19 @@
 import React from 'react'
 import { TransitionGroup, Transition } from 'react-transition-group'
+import { CSSProperties } from 'styled-components'
 import { useCollapse } from './hooks'
-import { Saved } from './types'
+import { Saved, HasClientHeight } from './types'
 
 type Props<T> = {
   items?: T[],
-  onSelect: (id: number) => unknown,
-  children: (item: T) => React.ReactElement,
+  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null | undefined) => void) => React.ReactElement,
   duration: number | string,
   as?: 'ul' | 'ol'
 }
 
 export default function createCollapsingList<T extends Saved>() {
 
-  const Items: React.FC<Props<T>> = ({ items, onSelect, children, duration, as = 'ul'}) => {
+  const Items: React.FC<Props<T>> = ({ items, children, duration, as = 'ul' }) => {
     const { styles, ref } = useCollapse(duration)
 
     return (
@@ -23,11 +23,7 @@ export default function createCollapsingList<T extends Saved>() {
             <Transition key={item.id} timeout={+duration}>
               {
                 state =>
-                  <li className="list-group-item list-group-item-action p-0 border-0" style={styles.current?.[state]} ref={ref} onClick={() => onSelect(+item.id)}>
-                    {
-                      children(item)
-                    }
-                  </li>
+                  children(item, styles.current?.[state], ref)
               }
             </Transition>
           )

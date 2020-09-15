@@ -1,7 +1,7 @@
 /* eslint-disable no-throw-literal */
 import { useContext, useCallback, useEffect, useLayoutEffect, useRef, CSSProperties } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto } from './types'
+import { Message, SavedAlbum, SavedPhoto, HasClientHeight } from './types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
@@ -15,7 +15,7 @@ type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>
 export const useCollapse = (duration: number | string) => {
   const styles = useRef<TransitionStyles | undefined>()
 
-  const ref = useCallback((em: HTMLLIElement) => {
+  const ref = useCallback((em: HasClientHeight | null | undefined) => {
     if (!em) return
 
     // Negative bottom margin to emulate collapsing/expanding behavior and shift content below upwards/downwards.

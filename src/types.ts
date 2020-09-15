@@ -36,3 +36,7 @@ export type SavedAlbum = Saved & Album & {
 export type TransitionStateful = {
   state: TransitionStatus
 }
+
+export type HasClientHeight = {
+  clientHeight: number | string
+}
