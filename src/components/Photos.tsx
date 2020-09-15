@@ -10,11 +10,11 @@ type Props = {
 
 const Collapse = collapsableListFactory<SavedPhoto>()
 
-const Photos: React.FC<Props> = ({ onSelect, ...props }) => 
-  <Collapse duration={500} {...props}>
+const Photos: React.FC<Props> = ({ onSelect, items }) => 
+  <Collapse className="list-group" duration={500} items={items}>
     {
       (photo, style, ref) => 
-        <li className="list-group-item list-group-item-action" style={style} ref={ref} onClick={() => onSelect(photo.id)}>
+        <li className="list-group-item list-group-item-action border-0 p-0" style={style} ref={ref} onClick={() => onSelect(photo.id)}>
           <Photo {...photo} />
         </li>
     }

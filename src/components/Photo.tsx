@@ -2,7 +2,7 @@ import React from 'react'
 import { SavedPhoto } from '../types'
 
 const Photo: React.FC<SavedPhoto> = ({ id, title, url, comment }) =>
-  <div>
+  <div className="p-3 border rounded">
     <div className="d-flex justify-content-between">
       <h5 className="mb-1">{title}</h5>
       <small>{id}</small>
