@@ -1,12 +1,8 @@
 import React from 'react'
 import { SavedPhoto } from '../types'
 
-type Props = SavedPhoto & {
-  onSelect: (id: number) => unknown
-}
-
-const Photo: React.FC<Props> = ({ onSelect, id, title, url, comment }) =>
-  <div className="text-light" onClick={() => onSelect(id)}>
+const Photo: React.FC<SavedPhoto> = ({ id, title, url, comment }) =>
+  <div className="p-3 border rounded">
     <div className="d-flex justify-content-between">
       <h5 className="mb-1">{title}</h5>
       <small>{id}</small>

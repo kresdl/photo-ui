@@ -1,3 +1,5 @@
+import { TransitionStatus } from "react-transition-group/Transition"
+
 export type Message = string[] | string | null | undefined
 
 export type Saved = { 
@@ -29,4 +31,8 @@ export type SavedPhoto = Saved & Photo
 
 export type SavedAlbum = Saved & Album & {
   photos: SavedPhoto[]
+}
+
+export type TransitionStateful = {
+  state: TransitionStatus
 }

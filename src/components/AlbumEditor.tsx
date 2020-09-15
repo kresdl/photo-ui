@@ -55,7 +55,7 @@ const AlbumEditor: React.FC = () => {
       </div>
       <div className="col-6">
         <h5 className="mb-3">Albums</h5>
-        <Albums items={albums?.sort(byTitle)} onSelect={discard} className="list-group"/>
+        <Albums items={albums?.sort(byTitle)} onSelect={discard} />
       </div>
     </div>
   )

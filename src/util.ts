@@ -1,7 +1,7 @@
 /* eslint-disable no-throw-literal */
 import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials, Titled } from './types'
 
-export const byTitle = (a: Titled, b: Titled) => a.title > b.title ? 1 : -1
+export const byTitle = (a: Titled, b: Titled) => a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
 
 const getToken = () => {
   const token = sessionStorage.getItem('token')

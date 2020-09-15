@@ -1,12 +1,8 @@
 import React from 'react'
 import { SavedAlbum } from '../types'
 
-type Props = SavedAlbum & {
-  onSelect: (id: number) => unknown
-}
-
-const Album: React.FC<Props> = ({ onSelect, id, title }) =>
-  <div className="d-flex justify-content-between" onClick={() => onSelect(id)}>
+const Album: React.FC<SavedAlbum> = ({ id, title }) =>
+  <div className="d-flex justify-content-between p-3 border">
     <h5 className="mb-1">{title}</h5>
     <small>{id}</small>
   </div>

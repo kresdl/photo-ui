@@ -1,6 +1,20 @@
+import React from 'react'
 import Photo from './Photo'
-import transitionListFactory from '../transitionListFactory'
+import { SavedPhoto } from '../types'
+import collapsableListFactory from '../collapsable-list-factory'
 
-const TransitionList = transitionListFactory(300, Photo)
+type Props = {
+  items?: SavedPhoto[]
+  onSelect: (id: number) => unknown
+}
 
-export default TransitionList
+const Collapse = collapsableListFactory<SavedPhoto>()
+
+const Photos: React.FC<Props> = props => 
+  <Collapse duration={500} {...props}>
+    {
+      photo => <Photo {...photo} />
+    }
+  </Collapse>
+
+export default Photos
