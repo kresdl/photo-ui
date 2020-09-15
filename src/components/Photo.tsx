@@ -6,7 +6,7 @@ type Props = SavedPhoto & {
 }
 
 const Photo: React.FC<Props> = ({ onSelect, id, title, url, comment }) =>
-  <div onClick={() => onSelect(id)}>
+  <div className="text-light" onClick={() => onSelect(id)}>
     <div className="d-flex justify-content-between">
       <h5 className="mb-1">{title}</h5>
       <small>{id}</small>
