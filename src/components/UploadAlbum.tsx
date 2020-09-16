@@ -23,7 +23,7 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
   return (
     <form onSubmit={submit}>
       <Field>Title</Field>
-      <Submit>Upload album</Submit>
+      <Submit>Upload</Submit>
     </form>
   )
 }

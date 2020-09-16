@@ -5,13 +5,17 @@ import './index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.css'
+import { ReactQueryDevtools } from 'react-query-devtools'
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
+  <>
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+    <ReactQueryDevtools />
+  </>,
   document.getElementById('root')
 );
 

@@ -43,7 +43,8 @@ const PhotoEditor: React.FC = () => {
 
   return (
     <div className="row">
-      <div className="col-6">
+      <div className="col-lg-6">
+        <h5 className="mb-4">Upload photo</h5>
         <UploadPhoto onUpload={upload} />
         <div className="pt-3">
           {
@@ -53,8 +54,8 @@ const PhotoEditor: React.FC = () => {
           }
         </div>
       </div>
-      <div className="col-6">
-        <h5 className="mb-3">Photos</h5>
+      <div className="col-lg-6">
+        <h5 className="mb-4"><span>Photos</span><small className="float-right">Delete</small></h5>
         <Photos items={photos?.sort(byTitle)} onSelect={discard} />
       </div>
     </div>

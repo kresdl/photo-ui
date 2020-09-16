@@ -1,43 +1,13 @@
 /* eslint-disable no-throw-literal */
-import { useContext, useCallback, useEffect, useLayoutEffect, useRef, CSSProperties } from 'react'
+import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, SavedAlbum, SavedPhoto, HasClientHeight } from './types'
+import { Message, SavedAlbum, SavedPhoto } from './types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
 } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
-import { TransitionStatus } from 'react-transition-group/Transition'
-
-type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>
-
-export const useCollapse = (duration: number | string) => {
-  const styles = useRef<TransitionStyles | undefined>()
-
-  const ref = useCallback((em: HasClientHeight | null | undefined) => {
-    if (!em) return
-
-    // Negative bottom margin to emulate collapsing/expanding behavior and shift content below upwards/downwards.
-    const animate = {
-      transitionProperty: 'opacity, margin-bottom',
-      transitionDuration: String(duration) + (Number.isNaN(+duration) ? '' : 'ms')
-    }
-
-    const marginBottom = -em.clientHeight,
-      position = 'relative',
-      zIndex = -1
-
-    styles.current = {
-      entering: { opacity: 0, marginBottom, position, zIndex },
-      entered: { opacity: 1, marginBottom: 0, ...animate },
-      exiting: { opacity: 0, marginBottom, position, zIndex, ...animate },
-      exited: { opacity: 0, marginBottom, position, zIndex }
-    }
-  }, [duration])
-
-  return { styles, ref }
-}
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!

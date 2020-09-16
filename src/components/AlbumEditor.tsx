@@ -43,7 +43,8 @@ const AlbumEditor: React.FC = () => {
 
   return (
     <div className="row">
-      <div className="col-6">
+      <div className="col-lg-6">
+        <h5 className="mb-4">Upload album</h5>
         <UploadAlbum onUpload={upload} />
         <div className="pt-3">
           {
@@ -53,8 +54,8 @@ const AlbumEditor: React.FC = () => {
           }
         </div>
       </div>
-      <div className="col-6">
-        <h5 className="mb-3">Albums</h5>
+      <div className="col-lg-6">
+        <h5 className="mb-4"><span>Albums</span><small className="float-right">Delete</small></h5>
         <Albums items={albums?.sort(byTitle)} onSelect={discard} />
       </div>
     </div>

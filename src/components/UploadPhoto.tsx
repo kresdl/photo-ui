@@ -28,7 +28,7 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       <Field>Title</Field>
       <Field>URL</Field>
       <Field optional id="comment">Comment (optional)</Field>
-      <Submit>Upload photo</Submit>
+      <Submit>Upload</Submit>
     </form>
   )
 }
