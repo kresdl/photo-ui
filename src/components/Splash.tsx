@@ -16,10 +16,10 @@ const Splash: React.FC = () => {
 
   return (
     <>
-      <div className="jumbotron">
+      <header className="jumbotron">
         <H1 className="text-center display-1 text-primary">Photo album X2000</H1>
         <p className="lead text-center">Your pixel pusher in cyberspace</p>
-      </div>
+      </header>
       <Center className="mx-auto pt-5">
         <SplashRouter />
         <p className="pt-3">{msg}</p>
