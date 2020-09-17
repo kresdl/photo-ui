@@ -63,38 +63,46 @@ const Organize: React.FC = () => {
     removePhoto(id, albumId!)
   }
 
-  const hasPhotos = photos?.length,
-    hasAlbums = albums?.length,
-    ready = (hasPhotos && hasAlbums) || null,
-    noPhotosMsg = !hasPhotos && 'No photos',
-    noAlbumsMsg = !hasAlbums && 'No albums'
+  const ready = (photos?.length && albums?.length) || null
 
   return (
     <div className="row">
       <div className="col-lg-6 pb-3 pb-lg-0">
-        <h5 className="mb-4"><span>Photos</span><small className="float-right">Add to album</small></h5>
+        <h5 className="mb-4">
+          {
+            photos?.length
+              ? <><span>Photos</span><small className="float-right">Add to album</small></>
+              : <span>No photos</span>
+          }
+        </h5>
         {
-          ready &&
-          <Photos items={photos} onSelect={add} />
+          ready && <Photos items={photos} onSelect={add} />
         }
         <div className="pt-3">
           {
             [photosMsg, albumsMsg, albumMsg, addMsg, removeMsg,
-              albumsErr, photosErr, albumErr, addErr, removeErr,
-              noPhotosMsg, noAlbumsMsg]
+              albumsErr, photosErr, albumErr, addErr, removeErr]
               .map(msg => msg && <p key={msg}>{msg}</p>)
           }
         </div>
       </div>
       <div className="col-lg-6">
-        <h5 className="mb-4">Album</h5>
+        <h5 className="mb-4">
+          <span>{albums?.length ? 'Album' : 'No albums'}</span>
+        </h5>
         {
           ready &&
           <>
             <div className="mb-3">
               <AlbumSelect albums={albums} onChange={change} selected={albumId} />
             </div>
-            <div className="mb-3"><span>Photos</span><small className="float-right">Remove from album</small></div>
+            <div className="mb-3">
+              {
+                album?.photos.length
+                  ? <><span>Photos</span><small className="float-right">Remove from album</small></>
+                  : <span>No photos</span>
+              }
+            </div>
             <div key={albumId}>
               <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
             </div>

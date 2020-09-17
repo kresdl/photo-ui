@@ -111,8 +111,7 @@ export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
 export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
   useMutate('photos', { loading: 'Uploading photo...' }, uploadPhoto,
     {
-      onSuccess: (photo: SavedPhoto) => 
-        addToCache('photos', photo),
+      onSuccess: (photo: SavedPhoto) => addToCache('photos', photo),
       ...config
     }
   )
@@ -131,13 +130,12 @@ export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
 export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
   useMutate('albums', { loading: 'Uploading album...' }, uploadAlbum,
     {
-      onSuccess: (album: SavedAlbum) => 
-        addToCache('albums', album),
+      onSuccess: (album: SavedAlbum) => addToCache('albums', album),
       ...config
     }
   )
 
-export const useAlbum = (id: number | null | undefined, config?: QueryConfig<SavedAlbum, string>) =>
+export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum, string>) =>
   useIndexedSync('album', id, { loading: 'Downloading album...' }, downloadAlbum, config)
 
 export const useAddPhoto = (config?: MutationConfig<unknown, string>) =>

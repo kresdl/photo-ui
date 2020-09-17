@@ -9,14 +9,14 @@ type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>
 
 type Props<T> = React.PropsWithoutRef<TransitionGroupProps> & {
   items?: T[],
-  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null | undefined) => void) => React.ReactElement,
+  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactElement,
   duration: number | string
 }
 
 const useCollapse = (duration: number | string) => {
   const styles = useRef<TransitionStyles | undefined>()
 
-  const ref = useCallback((em: HasClientHeight | null | undefined) => {
+  const ref = useCallback((em: HasClientHeight | null) => {
     if (!em) return
 
     // Negative bottom margin to emulate collapsing/expanding behavior and shift content below upwards/downwards.

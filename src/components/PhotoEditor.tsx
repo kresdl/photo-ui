@@ -55,7 +55,13 @@ const PhotoEditor: React.FC = () => {
         </div>
       </div>
       <div className="col-lg-6">
-        <h5 className="mb-4"><span>Photos</span><small className="float-right">Delete</small></h5>
+        <h5 className="mb-4">
+          {
+            photos?.length
+              ? <><span>Photos</span><small className="float-right">Delete</small></>
+              : <span>No photos</span>
+          }
+        </h5>
         <Photos items={photos?.sort(byTitle)} onSelect={discard} />
       </div>
     </div>
