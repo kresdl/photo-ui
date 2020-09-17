@@ -8,7 +8,6 @@ import {
 } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
-import AuthContext from './components/AuthContext'
 
 export const useNotify = () => {
   const [msg, setMsg] = useContext(MessageContext)!
@@ -21,8 +20,6 @@ export const useNotify = () => {
     }, [setMsg])
   }
 }
-
-export const useAuth = () => useContext(AuthContext)!
 
 export const useRouteMessage = () => {
   const { pathname, state } = useLocation<Message>()
@@ -38,17 +35,15 @@ export const useRouteMessage = () => {
 
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),
-    { pathname } = useLocation(),
-    [,setAuth] = useAuth()
+    { pathname } = useLocation()
 
   useEffect(() => {
     if (pathname === path) {
       sessionStorage.removeItem('token')
       queryCache.clear()
-      setAuth(false)
       history.push(redirect)
     }
-  }, [setAuth, path, redirect, history, pathname])
+  }, [path, redirect, history, pathname])
 }
 
 type StatusMsg = Partial<Record<QueryStatus, string>>

@@ -2,8 +2,7 @@ import React from 'react'
 import Sidebar from './Sidebar'
 import UserRouter from './UserRouter'
 import styled from 'styled-components'
-import { Redirect } from 'react-router-dom'
-import { useAuth, useLogout } from '../hooks'
+import { useLogout } from '../hooks'
 
 const Wrapper = styled.div`
   @media screen and (min-width: 768px) {
@@ -13,10 +12,8 @@ const Wrapper = styled.div`
 
 const User: React.FC = () => {
   useLogout('/user/logout', '/')
-  const [authenticated] = useAuth()
 
-  return authenticated
-    ?
+  return (
     <Wrapper className="row no-gutters">
       <header className="col-md-auto">
         <Sidebar />
@@ -27,8 +24,7 @@ const User: React.FC = () => {
         </div>
       </main>
     </Wrapper>
-    :
-    <Redirect to="/" />
+  )
 }
 
 export default User
