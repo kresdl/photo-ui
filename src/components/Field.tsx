@@ -8,7 +8,8 @@ type Props = {
   invalid?: boolean,
   id?: string,
   placeholder?: string,
-  autoComplete?: boolean
+  autoComplete?: boolean,
+  autoFocus?: boolean
 }
 
 export const Field: React.FC<Props> = ({ children, optional = false, invalid = false, id, autoComplete, ...rest }) => {

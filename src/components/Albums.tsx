@@ -11,13 +11,22 @@ type Props = {
 
 const Collapse = collapsableListFactory<SavedAlbum>()
 
-const Albums: React.FC<Props> = ({ onSelect, items, disabled }) => 
+const Albums: React.FC<Props> = ({ onSelect, items, disabled }) =>
   <Collapse className="list-group" duration={500} items={items}>
     {
-      (photo, style, ref) => 
-        <li className={`list-group-item list-group-item-action border-0 p-0 ${disabled ? 'disabled' : ''}`} style={style} ref={ref} onClick={() => !disabled && onSelect(photo.id)}>
-          <Album {...photo} />
-        </li>
+      (photo, style, ref) => {
+        const props = {
+          onClick: () => !disabled && onSelect(photo.id),
+          className: `list-group-item list-group-item-action border-0 p-0 ${disabled ? 'disabled' : ''}`,
+          style, ref
+        }
+
+        return (
+          <li {...props}>
+            <Album {...photo} />
+          </li>
+        )
+      }
     }
   </Collapse>
 

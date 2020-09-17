@@ -11,18 +11,20 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
 
-    const form = e.target as HTMLFormElement
-    const { value: title } = form.elements.namedItem('title') as HTMLInputElement
+    const form = e.target as HTMLFormElement,
+      em = form.elements.namedItem('title') as HTMLInputElement,
+      { value: title } = em
 
     try {
       await onUpload({ title })
       form.reset()
+      em.focus()
     } catch {}
   }
 
   return (
     <form onSubmit={submit}>
-      <Field>Title</Field>
+      <Field autoFocus={true}>Title</Field>
       <Submit>Upload</Submit>
     </form>
   )

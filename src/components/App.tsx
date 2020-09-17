@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
-import Ctx from './MessageContext'
+import MsgCtx from './MessageContext'
+import AuthCtx from './AuthContext'
 import MainRouter from './MainRouter'
-import { useLogout } from '../hooks'
 
 const App: React.FC = () => {
   const messaging = useState<string[]>([])
-  useLogout('/user/logout', '/')
+  const auth = useState<string | null>(null)
 
   return (
-    <Ctx.Provider value={messaging}>
-      <div className="container-fluid p-0">
-        <MainRouter />
-      </div>
-    </Ctx.Provider>
+    <AuthCtx.Provider value={auth}>
+      <MsgCtx.Provider value={messaging}>
+        <div className="container-fluid p-0">
+          <MainRouter />
+        </div>
+      </MsgCtx.Provider>
+    </AuthCtx.Provider>
   )
 }
 

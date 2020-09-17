@@ -13,19 +13,21 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
 
     const form = e.target as HTMLFormElement,
       { elements } = form,
+      titleEm = elements.namedItem('title') as HTMLInputElement,
+      { value: title } = titleEm,
       { value: url } = elements.namedItem('url') as HTMLInputElement,
-      { value: title } = elements.namedItem('title') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
     try {
       await onUpload({ url, title, comment })
       form.reset()
+      titleEm.focus()
     } catch {}
   }
 
   return (
     <form onSubmit={submit}>
-      <Field>Title</Field>
+      <Field autoFocus={true}>Title</Field>
       <Field autoComplete={true} >URL</Field>
       <Field optional id="comment">Comment (optional)</Field>
       <Submit>Upload</Submit>
