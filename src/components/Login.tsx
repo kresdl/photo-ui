@@ -5,10 +5,12 @@ import { Link, useHistory } from 'react-router-dom'
 import { login } from '../util'
 import { useNotify } from '../hooks'
 import { queryCache } from 'react-query'
+import { useAuth } from '../hooks'
 
 const Login: React.FC = () => {
   const history = useHistory()
   const { notify } = useNotify()
+  const [,setAuth] = useAuth()
 
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
@@ -21,6 +23,7 @@ const Login: React.FC = () => {
     try {
       const token = await login({ email, password }) as string
       sessionStorage.setItem('token', token)
+      setAuth(token)
       queryCache.clear()
       history.push('/user')
     } catch (err) {
