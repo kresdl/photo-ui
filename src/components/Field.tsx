@@ -7,14 +7,16 @@ type Props = {
   onChange?: React.ChangeEventHandler<HTMLInputElement>,
   invalid?: boolean,
   id?: string,
-  placeholder?: string
+  placeholder?: string,
+  autoComplete?: boolean
 }
 
-export const Field: React.FC<Props> = ({ children, optional = false, invalid = false, id, ...rest }) => {
+export const Field: React.FC<Props> = ({ children, optional = false, invalid = false, id, autoComplete, ...rest }) => {
   const props = {
     className: `form-control ${invalid ? 'is-invalid' : ''}`,
     id: id || children.toLocaleLowerCase().replace(' ', '-'),
     required: !optional,
+    autocomplete: autoComplete ? 'on' : 'off',
     ...rest
   }
 

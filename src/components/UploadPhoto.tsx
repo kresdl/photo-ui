@@ -26,7 +26,7 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
   return (
     <form onSubmit={submit}>
       <Field>Title</Field>
-      <Field>URL</Field>
+      <Field autoComplete={true} >URL</Field>
       <Field optional id="comment">Comment (optional)</Field>
       <Submit>Upload</Submit>
     </form>
