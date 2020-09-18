@@ -6,10 +6,7 @@ import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../hooks'
 import { Album } from '../types'
 
 const AlbumEditor: React.FC = () => {
-  const reset = () => {
-    uploadErr && resetUpload()
-    deleteErr && resetDelete()
-  }
+  const reset = () => deleteErr && resetDelete()
 
   const {
     data: albums,
@@ -27,8 +24,7 @@ const AlbumEditor: React.FC = () => {
   const {
     mutate: uploadAlbum,
     msg: uploadMsg,
-    error: uploadErr,
-    reset: resetUpload
+    error: uploadErr
   } = useUploadAlbum({ throwOnError: true })
 
   const upload = (album: Album) => {
@@ -44,22 +40,28 @@ const AlbumEditor: React.FC = () => {
   return (
     <div className="row">
       <div className="col-lg-6">
-        <h5 className="mb-4">Upload album</h5>
+        <h5 className="mb-4">
+          <span>Upload album</span>
+          <small className="float-right text-secondary">
+            {
+              uploadMsg || uploadErr
+            }
+          </small>
+        </h5>
         <UploadAlbum onUpload={upload} />
-        <div className="pt-3">
-          {
-            [loadMsg, deleteMsg, uploadMsg,
-              loadErr, deleteErr, uploadErr]
-              .map(msg => msg && <p key={msg}>{msg}</p>)
-          }
-        </div>
       </div>
       <div className="col-lg-6">
         <h5 className="mb-4">
           {
-            albums?.length
-              ? <><span>Albums</span><small className="float-right">Delete</small></>
-              : <span>No albums</span>
+            <>
+              <span>Albums</span>
+              <small className="float-right text-secondary">
+                {
+                  loadMsg || deleteMsg || loadErr || deleteErr
+                  || (albums?.length && 'Delete') || 'No albums'
+                }
+              </small>
+            </>
           }
         </h5>
         <Albums items={albums?.sort(byTitle)} onSelect={discard} />

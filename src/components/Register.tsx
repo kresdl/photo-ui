@@ -36,7 +36,7 @@ const Register: React.FC = () => {
 
     pwProps = {
       type: "password",
-      invalid: !pwSync, 
+      invalid: !pwSync,
 
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const { elements } = e.target.form!,

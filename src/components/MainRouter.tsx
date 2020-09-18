@@ -8,7 +8,7 @@ const MainRouter: React.FC = () =>
     <Route path="/user">
       <User />
     </Route>
-    <Route exact path="/">
+    <Route exact path={['/', '/register']}>
       <Splash />
     </Route>
     <Route path="*">

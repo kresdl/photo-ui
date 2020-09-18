@@ -64,54 +64,54 @@ const Organize: React.FC = () => {
   }
 
   const hasPhotos = photos?.length || null,
-    hasAlbums = albums?.length || null
+    hasAlbums = albums?.length || null,
+    albumHasPhotos = album?.photos.length || null
 
   return (
     <div className="row">
       <div className="col-lg-6 pb-3 pb-lg-0">
-        {
-          hasPhotos
-          ? <>
-              <h5 className="mb-4">
-                <span>Photos</span><small className="float-right">{hasAlbums && 'Add to album'}</small>
-              </h5>
-              <Photos items={photos} onSelect={add} disabled={!hasAlbums} />
-            </>
-          : <h5 className="mb-4">No photos</h5>
-        }
-        <div className="pt-3">
-          {
-            [photosMsg, albumsMsg, albumMsg, addMsg, removeMsg,
-              albumsErr, photosErr, albumErr, addErr, removeErr]
-              .map(msg => msg && <p key={msg}>{msg}</p>)
-          }
-        </div>
+        <h5 className="mb-4">
+          <span>Photos</span>
+          <small className="float-right text-secondary">
+            {
+              photosMsg || photosErr || addMsg || addErr 
+              || (hasPhotos && 'Add to album') || 'No photos'
+            }
+          </small>
+        </h5>
+        <Photos items={photos} onSelect={add} disabled={!hasAlbums} />
       </div>
       <div className="col-lg-6">
+        <h5 className="mb-4">
+          <span>Album</span>
+          <small className="float-right text-secondary">
+            {
+              albumsMsg || albumsErr || (!hasAlbums && 'No albums')
+            }
+          </small>
+        </h5>
         {
-          hasAlbums
-          ? <>
-              <h5 className="mb-4">Album</h5>
-              <div className="mb-3">
-                <AlbumSelect albums={albums} onChange={change} selected={albumId} disabled={!hasPhotos} />
+          hasAlbums &&
+          <>
+            <div className="mb-3">
+              <AlbumSelect albums={albums} onChange={change} 
+                  selected={albumId} disabled={!hasPhotos} />
+            </div>
+            <div className="mb-3">
+              <p>
+                <span>Photos</span>
+                <small className="float-right text-secondary">
+                  {
+                    albumMsg || albumErr || removeMsg || removeErr 
+                    || (albumHasPhotos && 'Remove from album') || 'No photos'
+                  }
+                </small>
+              </p>
+              <div key={albumId}>
+                <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
               </div>
-              <div className="mb-3">
-                {
-                  hasPhotos &&
-                    (
-                      album?.photos.length
-                      ? <>
-                          <p><span>Photos</span><small className="float-right">Remove from album</small></p>
-                          <div key={albumId}>
-                            <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
-                          </div>
-                        </>
-                      : <span>No photos</span>
-                    )
-                }
-              </div>
-            </>
-          : <h5 className="mb-4">No albums</h5>
+            </div>
+          </>
         }
       </div>
     </div>
