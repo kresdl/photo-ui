@@ -97,7 +97,7 @@ const useMutate = (
   }
 }
 
-const addToCache = <T extends Saved>(key: string, item: T) => 
+const appendToCache = <T extends Saved>(key: string, item: T) => 
   queryCache.setQueryData(key, (old: T[] | undefined) => old ? [...old, item] : [item])
 
 
@@ -115,7 +115,7 @@ export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
 export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
   useMutate(uploadPhoto, { loading: 'Uploading photo...' },
     {
-      onSuccess: (photo: SavedPhoto) => addToCache('photos', photo),
+      onSuccess: (photo: SavedPhoto) => appendToCache('photos', photo),
       ...config
     }
   )
@@ -134,7 +134,7 @@ export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
 export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
   useMutate(uploadAlbum, { loading: 'Uploading album...' },
     {
-      onSuccess: (album: SavedAlbum) => addToCache('albums', album),
+      onSuccess: (album: SavedAlbum) => appendToCache('albums', album),
       ...config
     }
   )
