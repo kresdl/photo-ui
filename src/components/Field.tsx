@@ -17,7 +17,7 @@ export const Field: React.FC<Props> = ({ children, optional = false, invalid = f
     className: `form-control ${invalid ? 'is-invalid' : ''}`,
     id: id || children.toLocaleLowerCase().replace(' ', '-'),
     required: !optional,
-    autocomplete: autoComplete ? 'on' : 'off',
+    autoComplete: autoComplete ? 'on' : 'off',
     ...rest
   }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import Album from './Album'
 import { SavedAlbum } from '../types'
-import collapsableListFactory from '../collapsable-list-factory'
+import selectableSavedItemsFactory from '../selectable-saved-items-factory'
 
 type Props = {
   items?: SavedAlbum[]
@@ -9,25 +9,13 @@ type Props = {
   disabled?: boolean
 }
 
-const Collapse = collapsableListFactory<SavedAlbum>()
+const Items = selectableSavedItemsFactory<SavedAlbum>()
 
-const Albums: React.FC<Props> = ({ onSelect, items, disabled }) =>
-  <Collapse className="list-group" duration={500} items={items}>
+const Photos: React.FC<Props> = props =>
+  <Items {...props}>
     {
-      (item, style, ref) => {
-        const props = {
-          onClick: () => !disabled && onSelect(item.id),
-          className: `list-group-item list-group-item-action border-0 p-0 ${disabled ? 'disabled' : ''}`,
-          style, ref
-        }
-
-        return (
-          <li {...props}>
-            <Album {...item} />
-          </li>
-        )
-      }
+      item => <Album {...item} />
     }
-  </Collapse>
+  </Items>
 
-export default Albums
+export default Photos

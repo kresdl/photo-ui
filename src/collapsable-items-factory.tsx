@@ -9,8 +9,8 @@ type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>
 
 type Props<T> = React.PropsWithoutRef<TransitionGroupProps> & {
   items?: T[],
+  duration: number | string,
   children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactElement,
-  duration: number | string
 }
 
 const useCollapse = (duration: number | string) => {
