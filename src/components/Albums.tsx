@@ -14,16 +14,16 @@ const Collapse = collapsableListFactory<SavedAlbum>()
 const Albums: React.FC<Props> = ({ onSelect, items, disabled }) =>
   <Collapse className="list-group" duration={500} items={items}>
     {
-      (photo, style, ref) => {
+      (item, style, ref) => {
         const props = {
-          onClick: () => !disabled && onSelect(photo.id),
+          onClick: () => !disabled && onSelect(item.id),
           className: `list-group-item list-group-item-action border-0 p-0 ${disabled ? 'disabled' : ''}`,
           style, ref
         }
 
         return (
           <li {...props}>
-            <Album {...photo} />
+            <Album {...item} />
           </li>
         )
       }

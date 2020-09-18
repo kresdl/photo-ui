@@ -55,8 +55,8 @@ type StatusMsg = Partial<Record<QueryStatus, string>>
 
 const useSync = <T>(
   key: string,
-  msg: StatusMsg,
   task: () => Promise<T>,
+  msg: StatusMsg,
   config?: QueryConfig<T, string>
 ) => {
   const { status, ...rest } = useQuery(key, task, config)
@@ -67,8 +67,8 @@ const useSync = <T>(
 const useIndexedSync = <T>(
   key: string,
   index: any,
-  msg: StatusMsg,
   task: (id: number) => Promise<T>,
+  msg: StatusMsg,
   config?: QueryConfig<T, string>
 ) => {
   const { status, ...rest } = useQuery(
@@ -81,9 +81,8 @@ const useIndexedSync = <T>(
 }
 
 const useMutate = (
-  key: string,
-  msg: StatusMsg,
   task: (...args: any) => Promise<any>,
+  msg: StatusMsg,
   config?: MutationConfig<any, string>
 ) => {
   const [mutate, { status, ...rest }] = useMutation(
@@ -103,10 +102,10 @@ const addToCache = <T extends Saved>(key: string, item: T) =>
 
 
 export const usePhotos = (config?: QueryConfig<SavedPhoto[], string>) =>
-  useSync('photos', { loading: 'Downloading photos...' }, downloadPhotos, config)
+  useSync('photos', downloadPhotos, { loading: 'Downloading photos...' }, config)
 
 export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate('photos', { loading: 'Deleting photo...' }, deletePhoto, 
+  useMutate(deletePhoto, { loading: 'Deleting photo...' },
     {
       onSuccess: () => queryCache.invalidateQueries('photos'),
       ...config      
@@ -114,7 +113,7 @@ export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
   )
 
 export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
-  useMutate('photos', { loading: 'Uploading photo...' }, uploadPhoto,
+  useMutate(uploadPhoto, { loading: 'Uploading photo...' },
     {
       onSuccess: (photo: SavedPhoto) => addToCache('photos', photo),
       ...config
@@ -122,10 +121,10 @@ export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
   )
 
 export const useAlbums = (config?: QueryConfig<SavedAlbum[], string>) =>
-  useSync('albums', { loading: 'Downloading albums...' }, downloadAlbums, config)
+  useSync('albums', downloadAlbums, { loading: 'Downloading albums...' }, config)
 
 export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
-  useMutate('albums', { loading: 'Deleting album...' }, deleteAlbum,
+  useMutate(deleteAlbum, { loading: 'Deleting album...' },
     {
       onSuccess: () => queryCache.invalidateQueries('albums'),
       ...config
@@ -133,7 +132,7 @@ export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
   )
 
 export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
-  useMutate('albums', { loading: 'Uploading album...' }, uploadAlbum,
+  useMutate(uploadAlbum, { loading: 'Uploading album...' },
     {
       onSuccess: (album: SavedAlbum) => addToCache('albums', album),
       ...config
@@ -141,10 +140,10 @@ export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
   )
 
 export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum, string>) =>
-  useIndexedSync('album', id, { loading: 'Downloading album...' }, downloadAlbum, config)
+  useIndexedSync('album', id, downloadAlbum, { loading: 'Downloading album...' }, config)
 
 export const useAddPhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate('album', { loading: 'Adding photo to album...' }, addPhotoToAlbum,
+  useMutate(addPhotoToAlbum, { loading: 'Adding photo to album...' },
     {
       onSuccess: () => queryCache.invalidateQueries('album'),
       ...config
@@ -152,7 +151,7 @@ export const useAddPhoto = (config?: MutationConfig<unknown, string>) =>
   )
 
 export const useRemovePhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate('album', { loading: 'Removing photo from album...' }, removePhotoFromAlbum,
+  useMutate(removePhotoFromAlbum, { loading: 'Removing photo from album...' },
     {
       onSuccess: () => queryCache.invalidateQueries('album'),
       ...config
