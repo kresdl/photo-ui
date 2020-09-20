@@ -24,4 +24,5 @@ const AlbumSelect: React.FC<Props> = ({ albums, onChange, selected, disabled }) 
     </select>
   )
 }
+
 export default AlbumSelect

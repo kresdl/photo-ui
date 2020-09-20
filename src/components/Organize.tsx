@@ -74,7 +74,7 @@ const Organize: React.FC = () => {
           <span>Photos</span>
           <small className="float-right text-secondary">
             {
-              photosMsg || photosErr || addMsg || addErr 
+              photosMsg || photosErr || addMsg || addErr
               || (hasPhotos && 'Add to album') || 'No photos'
             }
           </small>
@@ -94,19 +94,22 @@ const Organize: React.FC = () => {
           hasAlbums &&
           <>
             <div className="mb-3">
-              <AlbumSelect albums={albums} onChange={change} 
-                  selected={albumId} disabled={!hasPhotos} />
+              <AlbumSelect albums={albums} onChange={change}
+                selected={albumId} disabled={!hasPhotos} />
             </div>
             <div className="mb-3">
-              <p>
-                <span>Photos</span>
-                <small className="float-right text-secondary">
-                  {
-                    albumMsg || albumErr || removeMsg || removeErr 
-                    || (albumHasPhotos && 'Remove from album') || 'No photos'
-                  }
-                </small>
-              </p>
+              {
+                hasPhotos &&
+                <p>
+                  <span>Photos</span>
+                  <small className="float-right text-secondary">
+                    {
+                      albumMsg || albumErr || removeMsg || removeErr
+                      || (albumHasPhotos && 'Remove from album') || 'No photos'
+                    }
+                  </small>
+                </p>
+              }
               <div key={albumId}>
                 <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
               </div>

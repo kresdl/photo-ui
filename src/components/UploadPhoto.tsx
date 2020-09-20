@@ -18,9 +18,11 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       { value: url } = elements.namedItem('url') as HTMLInputElement,
       { value: comment } = elements.namedItem('comment') as HTMLInputElement
 
-    await onUpload({ url, title, comment })
-    form.reset()
-    titleEm.focus()
+    try {
+      await onUpload({ url, title, comment })
+      form.reset()
+      titleEm.focus()
+    } catch {}
   }
 
   return (
@@ -28,9 +30,7 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       <Field autoFocus={true}>Title</Field>
       <Field autoComplete={true} >URL</Field>
       <Field optional id="comment">Comment (optional)</Field>
-      <div className="form-group">
-        <Submit>Upload</Submit>
-      </div>
+      <Submit>Upload</Submit>
     </form>
   )
 }

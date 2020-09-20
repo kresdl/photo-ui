@@ -15,17 +15,17 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
       em = form.elements.namedItem('title') as HTMLInputElement,
       { value: title } = em
 
-    await onUpload({ title })
-    form.reset()
-    em.focus()
+    try {
+      await onUpload({ title })
+      form.reset()
+      em.focus()
+    } catch {}
   }
 
   return (
     <form onSubmit={submit}>
       <Field autoFocus={true}>Title</Field>
-      <div className="form-group">
-        <Submit>Upload</Submit>
-      </div>
+      <Submit>Upload</Submit>
     </form>
   )
 }

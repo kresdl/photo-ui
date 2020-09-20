@@ -5,7 +5,7 @@ import selectableSavedItemsFactory from '../selectable-saved-items-factory'
 
 type Props = {
   items?: SavedPhoto[]
-  onSelect: (id: number) => unknown,
+  onSelect: (id: number) => void,
   disabled?: boolean
 }
 
