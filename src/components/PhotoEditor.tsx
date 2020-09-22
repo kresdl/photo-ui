@@ -36,11 +36,11 @@ const PhotoEditor: React.FC = () => {
       </div>
       <div className="col-lg-6">
         <h5 className="mb-4">
-          <span>Albums</span>
+          <span>Photos</span>
           <small className="float-right text-secondary">
             {
               loadMsg || deleteMsg || loadErr || deleteErr
-              || (photos?.length && 'Delete') || 'No albums'
+              || (photos?.length && 'Delete') || 'No photos'
             }
           </small>
         </h5>
