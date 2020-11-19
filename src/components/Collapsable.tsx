@@ -3,15 +3,9 @@ import { TransitionGroup, Transition } from 'react-transition-group'
 import { TransitionStatus } from 'react-transition-group/Transition'
 import { TransitionGroupProps } from 'react-transition-group/TransitionGroup'
 import { CSSProperties } from 'styled-components'
-import { Saved, HasClientHeight } from './types'
+import { Saved, HasClientHeight } from '../types'
 
 type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>
-
-type Props<T> = React.PropsWithoutRef<TransitionGroupProps> & {
-  items?: T[],
-  duration: number | string,
-  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactElement,
-}
 
 const useCollapse = (duration: number | string) => {
   const styles = useRef<TransitionStyles | undefined>()
@@ -40,23 +34,28 @@ const useCollapse = (duration: number | string) => {
   return { styles, ref }
 }
 
-export default function createCollapsingList<T extends Saved>(): React.FC<Props<T>> {
-
-  return ({ items, children, duration, ...rest }) => {
-    const { styles, ref } = useCollapse(duration)
-
-    return (
-      <TransitionGroup {...rest}>
-        {
-          items?.map(item =>
-            <Transition key={item.id} timeout={+duration}>
-              {
-                state => children(item, styles.current?.[state], ref)
-              }
-            </Transition>
-          )
-        }
-      </TransitionGroup>
-    )
-  }
+type Props<T> = React.PropsWithoutRef<TransitionGroupProps> & {
+  items?: T[],
+  duration: number | string,
+  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactElement,
 }
+
+const Collapsable = <T extends Saved>({ items, children, duration, ...rest }: Props<T>): React.ReactElement => {
+  const { styles, ref } = useCollapse(duration)
+
+  return (
+    <TransitionGroup {...rest}>
+      {
+        items?.map(item =>
+          <Transition key={item.id} timeout={+duration}>
+            {
+              state => children(item, styles.current?.[state], ref)
+            }
+          </Transition>
+        )
+      }
+    </TransitionGroup>
+  )
+}
+
+export default Collapsable

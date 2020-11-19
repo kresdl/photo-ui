@@ -2,9 +2,9 @@ import React from 'react'
 import { SavedAlbum } from '../types'
 
 type Props = {
-  albums: SavedAlbum[] | undefined
+  albums?: SavedAlbum[]
   onChange: (id: number) => unknown,
-  selected: number | undefined,
+  selected?: number,
   disabled?: boolean
 }
 

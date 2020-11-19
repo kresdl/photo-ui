@@ -1,19 +1,16 @@
 import React from 'react'
-import { Saved } from './types'
-import collapsableItemsFactory from './collapsable-items-factory'
+import { Saved } from '../types'
+import Collapsable from './Collapsable'
 
 type Props<T> = {
   items?: T[]
   onSelect: (id: number) => unknown,
   disabled?: boolean,
-  children: (item: T) => React.ReactElement
+  children: (item: T) => React.ReactNode
 }
 
-const selectableSavedItemsFactory = <T extends Saved>() => {
-  const Collapse = collapsableItemsFactory<T>()
-
-  const SelectableSavedItems: React.FC<Props<T>> = ({ onSelect, items, disabled, children }) =>
-    <Collapse className="list-group" duration={500} items={items}>
+const Selectable = <T extends Saved>({ onSelect, items, disabled, children }: Props<T>): React.ReactElement =>
+    <Collapsable className="list-group" duration={500} items={items}>
       {
         (item, style, ref) => {
           const props = {
@@ -31,9 +28,6 @@ const selectableSavedItemsFactory = <T extends Saved>() => {
           )
         }
       }
-    </Collapse>
+    </Collapsable>
 
-  return SelectableSavedItems
-}
-
-export default selectableSavedItemsFactory
+export default Selectable

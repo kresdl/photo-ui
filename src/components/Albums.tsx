@@ -1,7 +1,7 @@
 import React from 'react'
 import Album from './Album'
 import { SavedAlbum } from '../types'
-import selectableSavedItemsFactory from '../selectable-saved-items-factory'
+import Selectable from './Selectable'
 
 type Props = {
   items?: SavedAlbum[]
@@ -9,13 +9,11 @@ type Props = {
   disabled?: boolean
 }
 
-const Items = selectableSavedItemsFactory<SavedAlbum>()
-
 const Albums: React.FC<Props> = props =>
-  <Items {...props}>
+  <Selectable {...props}>
     {
       item => <Album {...item} />
     }
-  </Items>
+  </Selectable>
 
 export default Albums

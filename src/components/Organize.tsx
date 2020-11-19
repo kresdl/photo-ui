@@ -12,23 +12,9 @@ const Organize: React.FC = () => {
 
   const [albumId, setAlbumId] = useState<number | undefined>()
 
-  const {
-    data: photos,
-    msg: photosMsg,
-    error: photosErr
-  } = usePhotos()
-
-  const {
-    data: albums,
-    msg: albumsMsg,
-    error: albumsErr
-  } = useAlbums()
-
-  const {
-    data: album,
-    msg: albumMsg,
-    error: albumErr
-  } = useAlbum(albumId)
+  const photos = usePhotos()
+  const albums = useAlbums()
+  const album = useAlbum(albumId)
 
   const {
     mutate: addPhoto,
@@ -45,8 +31,8 @@ const Organize: React.FC = () => {
   } = useRemovePhoto()
 
   useEffect(() => {
-    albums?.length && setAlbumId(albums[0].id)
-  }, [albums])
+    albums.data?.length && setAlbumId(albums.data[0].id)
+  }, [albums.data])
 
   const change = (id: number) => {
     reset()
@@ -63,9 +49,11 @@ const Organize: React.FC = () => {
     removePhoto(id, albumId!)
   }
 
-  const hasPhotos = photos?.length || null,
-    hasAlbums = albums?.length || null,
-    albumHasPhotos = album?.photos.length || null
+  const hasPhotos = photos.data?.length || null,
+    hasAlbums = albums.data?.length || null,
+    albumHasPhotos = album.data?.photos.length || null
+
+  console.log('id. ', albumId)
 
   return (
     <div className="row">
@@ -74,19 +62,19 @@ const Organize: React.FC = () => {
           <span>Photos</span>
           <small className="float-right text-secondary">
             {
-              photosMsg || photosErr || addMsg || addErr
+              photos.msg || photos.error || addMsg || addErr
               || (hasPhotos && 'Add to album') || 'No photos'
             }
           </small>
         </h5>
-        <Photos items={photos} onSelect={add} disabled={!hasAlbums} />
+        <Photos items={photos.data} onSelect={add} disabled={!hasAlbums} />
       </div>
       <div className="col-lg-6">
         <h5 className="mb-4">
           <span>Album</span>
           <small className="float-right text-secondary">
             {
-              albumsMsg || albumsErr || (!hasAlbums && 'No albums')
+              albums.msg || albums.error || (!hasAlbums && 'No albums')
             }
           </small>
         </h5>
@@ -94,7 +82,7 @@ const Organize: React.FC = () => {
           hasAlbums &&
           <>
             <div className="mb-3">
-              <AlbumSelect albums={albums} onChange={change}
+              <AlbumSelect albums={albums.data} onChange={change}
                 selected={albumId} disabled={!hasPhotos} />
             </div>
             <div className="mb-3">
@@ -104,14 +92,14 @@ const Organize: React.FC = () => {
                   <span>Photos</span>
                   <small className="float-right text-secondary">
                     {
-                      albumMsg || albumErr || removeMsg || removeErr
+                      album.msg || album.error || removeMsg || removeErr
                       || (albumHasPhotos && 'Remove from album') || 'No photos'
                     }
                   </small>
                 </p>
               }
               <div key={albumId}>
-                <Photos items={album?.photos.sort(byTitle)} onSelect={remove} />
+                <Photos items={album.data?.photos.sort(byTitle)} onSelect={remove} />
               </div>
             </div>
           </>

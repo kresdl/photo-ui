@@ -5,11 +5,7 @@ import { byTitle } from '../util'
 import { usePhotos, useDeletePhoto, useUploadPhoto } from '../hooks'
 
 const PhotoEditor: React.FC = () => {
-  const {
-    data: photos,
-    msg: loadMsg,
-    error: loadErr
-  } = usePhotos()
+  const photos = usePhotos()
 
   const {
     mutate: deletePhoto,
@@ -39,12 +35,12 @@ const PhotoEditor: React.FC = () => {
           <span>Albums</span>
           <small className="float-right text-secondary">
             {
-              loadMsg || deleteMsg || loadErr || deleteErr
-              || (photos?.length && 'Delete') || 'No albums'
+              photos.msg || deleteMsg || photos.error || deleteErr
+              || (photos.data?.length && 'Delete') || 'No albums'
             }
           </small>
         </h5>
-        <Photos items={photos?.sort(byTitle)} onSelect={deletePhoto} />
+        <Photos items={photos.data?.sort(byTitle)} onSelect={deletePhoto} />
       </div>
     </div>
   )

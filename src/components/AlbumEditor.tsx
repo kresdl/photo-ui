@@ -5,11 +5,7 @@ import { byTitle } from '../util'
 import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../hooks'
 
 const AlbumEditor: React.FC = () => {
-  const {
-    data: albums,
-    msg: loadMsg,
-    error: loadErr
-  } = useAlbums()
+  const albums = useAlbums()
 
   const {
     mutate: deleteAlbum,
@@ -39,12 +35,12 @@ const AlbumEditor: React.FC = () => {
           <span>Albums</span>
           <small className="float-right text-secondary">
             {
-              loadMsg || deleteMsg || loadErr || deleteErr
-              || (albums?.length && 'Delete') || 'No albums'
+              albums.msg || deleteMsg || albums.error || deleteErr
+              || (albums.data?.length && 'Delete') || 'No albums'
             }
           </small>
         </h5>
-        <Albums items={albums?.sort(byTitle)} onSelect={deleteAlbum} />
+        <Albums items={albums.data?.sort(byTitle)} onSelect={deleteAlbum} />
       </div>
     </div>
   )

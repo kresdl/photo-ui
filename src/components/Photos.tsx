@@ -1,7 +1,7 @@
 import React from 'react'
 import Photo from './Photo'
 import { SavedPhoto } from '../types'
-import selectableSavedItemsFactory from '../selectable-saved-items-factory'
+import Selectable from './Selectable'
 
 type Props = {
   items?: SavedPhoto[]
@@ -9,13 +9,11 @@ type Props = {
   disabled?: boolean
 }
 
-const Items = selectableSavedItemsFactory<SavedPhoto>()
-
 const Photos: React.FC<Props> = props =>
-  <Items {...props}>
+  <Selectable {...props}>
     {
       item => <Photo {...item} />
     }
-  </Items>
+  </Selectable>
 
 export default Photos
