@@ -1,10 +1,10 @@
 import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
-import { Photo } from '../types'
+import { Photo, SavedPhoto } from '../types'
 
 type Props = {
-  onUpload: (photo: Photo) => Promise<void>
+  onUpload: (photo: Photo) => Promise<SavedPhoto | undefined>
 }
 
 const UploadPhoto: React.FC<Props> = ({ onUpload }) => {

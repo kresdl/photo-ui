@@ -3,6 +3,7 @@ import Photos from './Photos'
 import AlbumSelect from './AlbumSelect'
 import { byTitle } from '../util'
 import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../hooks'
+import { SavedPhoto } from '../types'
 
 const Organize: React.FC = () => {
   const reset = () => {
@@ -16,19 +17,21 @@ const Organize: React.FC = () => {
   const albums = useAlbums()
   const album = useAlbum(albumId)
 
-  const {
-    mutate: addPhoto,
-    msg: addMsg,
-    error: addErr,
-    reset: resetAdd
-  } = useAddPhoto()
+  const [
+    addPhoto, 
+    {
+      error: addErr,
+      reset: resetAdd
+    }
+   ] = useAddPhoto()
 
-  const {
-    mutate: removePhoto,
-    msg: removeMsg,
-    error: removeErr,
-    reset: resetRemove
-  } = useRemovePhoto()
+  const [
+    removePhoto,
+    {
+      error: removeErr,
+      reset: resetRemove
+    },
+   ] = useRemovePhoto()
 
   useEffect(() => {
     albums.data?.length && setAlbumId(albums.data[0].id)
@@ -39,21 +42,21 @@ const Organize: React.FC = () => {
     setAlbumId(id)
   }
 
-  const add = (id: number) => {
+  const add = (photo: SavedPhoto) => {
     reset()
-    addPhoto(id, albumId!)
+    addPhoto({ photo, albumId: albumId! })
   }
 
-  const remove = (id: number) => {
+  const remove = (photo: SavedPhoto) => {
     reset()
-    removePhoto(id, albumId!)
+    removePhoto({ photo, albumId: albumId! })
   }
+
+  console.log(addErr)
 
   const hasPhotos = photos.data?.length || null,
     hasAlbums = albums.data?.length || null,
     albumHasPhotos = album.data?.photos.length || null
-
-  console.log('id. ', albumId)
 
   return (
     <div className="row">
@@ -62,7 +65,7 @@ const Organize: React.FC = () => {
           <span>Photos</span>
           <small className="float-right text-secondary">
             {
-              photos.msg || photos.error || addMsg || addErr
+              photos.msg || photos.error || addErr
               || (hasPhotos && 'Add to album') || 'No photos'
             }
           </small>
@@ -92,7 +95,7 @@ const Organize: React.FC = () => {
                   <span>Photos</span>
                   <small className="float-right text-secondary">
                     {
-                      album.msg || album.error || removeMsg || removeErr
+                      album.msg || album.error || removeErr
                       || (albumHasPhotos && 'Remove from album') || 'No photos'
                     }
                   </small>

@@ -1,10 +1,10 @@
 import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
-import { Album } from '../types'
+import { Album, SavedAlbum } from '../types'
 
 type Props = {
-  onUpload: (album: Album) => Promise<void>
+  onUpload: (album: Album) => Promise<SavedAlbum | undefined>
 }
 
 const UploadAlbum: React.FC<Props> = ({ onUpload }) => {

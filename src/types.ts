@@ -40,3 +40,8 @@ export type TransitionStateful = {
 export type HasClientHeight = {
   clientHeight: number | string
 }
+
+export type Assignment = {
+  photo: SavedPhoto
+  albumId: number
+}

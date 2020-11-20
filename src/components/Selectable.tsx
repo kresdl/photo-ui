@@ -4,7 +4,7 @@ import Collapsable from './Collapsable'
 
 type Props<T> = {
   items?: T[]
-  onSelect: (id: number) => unknown,
+  onSelect: (item: T) => void,
   disabled?: boolean,
   children: (item: T) => React.ReactNode
 }
@@ -14,7 +14,7 @@ const Selectable = <T extends Saved>({ onSelect, items, disabled, children }: Pr
       {
         (item, style, ref) => {
           const props = {
-            onClick: () => !disabled && onSelect(item.id),
+            onClick: () => !disabled && onSelect(item),
             className: `list-group-item list-group-item-action border-0 p-0 ${disabled ? 'disabled' : ''}`,
             style, ref
           }

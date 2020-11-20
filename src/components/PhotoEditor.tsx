@@ -7,17 +7,8 @@ import { usePhotos, useDeletePhoto, useUploadPhoto } from '../hooks'
 const PhotoEditor: React.FC = () => {
   const photos = usePhotos()
 
-  const {
-    mutate: deletePhoto,
-    msg: deleteMsg,
-    error: deleteErr,
-  } = useDeletePhoto()
-
-  const {
-    mutate: uploadPhoto,
-    msg: uploadMsg,
-    error: uploadErr
-  } = useUploadPhoto({ throwOnError: true })
+  const [deletePhoto, { error: deleteErr }] = useDeletePhoto()
+  const [uploadPhoto, { error: uploadErr }] = useUploadPhoto()
 
   return (
     <div className="row">
@@ -25,7 +16,7 @@ const PhotoEditor: React.FC = () => {
         <h5 className="mb-4">
           <span>Upload photo</span>
           <small className="float-right text-secondary">
-            {uploadMsg || uploadErr}
+            {uploadErr}
           </small>
         </h5>
         <UploadPhoto onUpload={uploadPhoto} />
@@ -35,7 +26,7 @@ const PhotoEditor: React.FC = () => {
           <span>Albums</span>
           <small className="float-right text-secondary">
             {
-              photos.msg || deleteMsg || photos.error || deleteErr
+              photos.msg || photos.error || deleteErr
               || (photos.data?.length && 'Delete') || 'No albums'
             }
           </small>

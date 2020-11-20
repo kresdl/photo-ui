@@ -5,7 +5,7 @@ import Selectable from './Selectable'
 
 type Props = {
   items?: SavedAlbum[]
-  onSelect: (id: number) => void,
+  onSelect: (item: SavedAlbum) => void,
   disabled?: boolean
 }
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-throw-literal */
 import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
 import MessageContext from './components/MessageContext'
-import { Message, Saved, SavedAlbum, SavedPhoto } from './types'
+import { Assignment, Message, Saved, SavedAlbum, SavedPhoto } from './types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
@@ -9,6 +9,7 @@ import {
 import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
 import AuthContext from './components/AuthContext'
+import update from 'immutability-helper'
 
 export const useAuth = () => useContext(AuthContext)!
 
@@ -39,7 +40,7 @@ export const useRouteMessage = () => {
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),
     { pathname } = useLocation(),
-    [,setAuth] = useAuth()
+    [, setAuth] = useAuth()
 
   useEffect(() => {
     if (pathname === path) {
@@ -80,27 +81,6 @@ const useIndexedSync = <T>(
   return { ...rest, status, msg: msg[status] }
 }
 
-const useMutate = (
-  task: (...args: any) => Promise<any>,
-  msg: StatusMsg,
-  config?: MutationConfig<any, string>
-) => {
-  const [mutate, { status, ...rest }] = useMutation(
-    (args: any[]) => task(...args),
-    config
-  )
-
-  return {
-    ...rest, status,
-    mutate: (...args: any[]) => mutate(args),
-    msg: msg[status],
-  }
-}
-
-const appendToCache = <T extends Saved>(key: string, item: T) => 
-  queryCache.setQueryData(key, (old: T[] | undefined) => old ? [...old, item] : [item])
-
-
 export const usePhotos = (config?: QueryConfig<SavedPhoto[], string>) =>
   useSync('photos', downloadPhotos, { loading: 'Downloading photos...' }, config)
 
@@ -110,50 +90,107 @@ export const useAlbums = (config?: QueryConfig<SavedAlbum[], string>) =>
 export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum, string>) =>
   useIndexedSync('album', id, downloadAlbum, { loading: 'Downloading album...' }, config)
 
-export const useAddPhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate(addPhotoToAlbum, { loading: 'Adding photo to album...' },
-    {
-      onSuccess: () => queryCache.invalidateQueries('album'),
-      ...config
-    }
+export const useUploadPhoto = () =>
+  useMutation(uploadPhoto, optimisticUpload('photos'))
+
+export const useUploadAlbum = () =>
+  useMutation(uploadAlbum, optimisticUpload('albums'))
+
+export const useDeletePhoto = () =>
+  useMutation(
+    (photo) => deletePhoto(photo.id), 
+    optimisticDelete('photos')
   )
 
-export const useRemovePhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate(removePhotoFromAlbum, { loading: 'Removing photo from album...' },
-    {
-      onSuccess: () => queryCache.invalidateQueries('album'),
-      ...config
-    }
+export const useDeleteAlbum = () =>
+  useMutation(
+    (album) => deleteAlbum(album.id),
+    optimisticDelete('albums')
   )
 
-export const useDeleteAlbum = (config?: MutationConfig<unknown, string>) =>
-  useMutate(deleteAlbum, { loading: 'Deleting album...' },
-    {
-      onSuccess: () => queryCache.invalidateQueries('albums'),
-      ...config
-    }
+export const useAddPhoto = () =>
+  useMutation(
+    ({ albumId, photo }: Assignment) => addPhotoToAlbum(photo.id, albumId), 
+    optimisticAdd
   )
 
-export const useUploadAlbum = (config?: MutationConfig<SavedAlbum, string>) =>
-  useMutate(uploadAlbum, { loading: 'Uploading album...' },
-    {
-      onSuccess: (album: SavedAlbum) => appendToCache('albums', album),
-      ...config
-    }
+export const useRemovePhoto = () =>
+  useMutation(
+    ({ albumId, photo }: Assignment) => removePhotoFromAlbum(photo.id, albumId), 
+    optimisticRemove
   )
 
-export const useDeletePhoto = (config?: MutationConfig<unknown, string>) =>
-  useMutate(deletePhoto, { loading: 'Deleting photo...' },
-    {
-      onSuccess: () => queryCache.invalidateQueries('photos'),
-      ...config      
-    }
-  )
+const optimisticUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
+  onSuccess: (item: S) => {
+    queryCache.setQueryData(key, (old: S[] | undefined) => old ? [...old, item] : [item])
+  },
 
-export const useUploadPhoto = (config?: MutationConfig<SavedPhoto, string>) =>
-  useMutate(uploadPhoto, { loading: 'Uploading photo...' },
-    {
-      onSuccess: (photo: SavedPhoto) => appendToCache('photos', photo),
-      ...config
-    }
-  )
+  throwOnError: true,
+});
+
+const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, string, S, S[]> => ({
+  onMutate: (item) => {
+    queryCache.cancelQueries();
+    const old = queryCache.getQueryData(key) as S[];
+    queryCache.setQueryData(key, (old: S[] | undefined) => old?.filter(t => t.id !== item.id) || [])
+    return old;
+  },
+
+  onSuccess: () => {
+    queryCache.invalidateQueries(key);
+  },
+
+  onError: (_error, _item, old) => {
+    queryCache.setQueryData(key, old);
+  },
+
+  throwOnError: true,
+});
+
+const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+  onMutate: ({ albumId, photo }) => {
+    queryCache.cancelQueries();
+    const key = ['album', albumId];
+    const old = queryCache.getQueryData(key) as SavedAlbum;
+    queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, { 
+      photos: { 
+        $push: ([photo]) 
+      } 
+    }))
+    return old;
+  },
+
+  onSuccess: ({ albumId }) => {
+    queryCache.invalidateQueries(['albums', albumId]);
+  },
+
+  onError: (_error, { albumId }, old) => {
+    queryCache.setQueryData(['album', albumId], old);
+  },
+
+  throwOnError: true,
+};
+
+const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+  onMutate: ({ albumId, photo }) => {
+    queryCache.cancelQueries();
+    const key = ['album', albumId];
+    const old = queryCache.getQueryData(key) as SavedAlbum;
+    queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, {
+      photos: {
+        $apply: (photos: SavedPhoto[]) => photos.filter(p => p.id !== photo.id)
+      }
+    }))
+    return old;
+  },
+
+  onSuccess: ({ albumId }) => {
+    queryCache.invalidateQueries(['album', albumId]);
+  },
+
+  onError: (_error, { albumId }, old) => {
+    queryCache.setQueryData(['album', albumId], old);
+  },
+
+  throwOnError: true,
+};
