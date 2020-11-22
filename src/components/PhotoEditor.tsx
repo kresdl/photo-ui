@@ -23,7 +23,7 @@ const PhotoEditor: React.FC = () => {
       </div>
       <div className="col-lg-6">
         <h5 className="mb-4">
-          <span>Albums</span>
+          <span>Photos</span>
           <small className="float-right text-secondary">
             {
               photos.msg || photos.error || deleteErr
