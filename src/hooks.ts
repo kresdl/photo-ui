@@ -91,10 +91,10 @@ export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum
   useIndexedSync('album', id, downloadAlbum, { loading: 'Downloading album...' }, config)
 
 export const useUploadPhoto = () =>
-  useMutation(uploadPhoto, optimisticUpload('photos'))
+  useMutation(uploadPhoto, eagerUpload('photos'))
 
 export const useUploadAlbum = () =>
-  useMutation(uploadAlbum, optimisticUpload('albums'))
+  useMutation(uploadAlbum, eagerUpload('albums'))
 
 export const useDeletePhoto = () =>
   useMutation(
@@ -120,7 +120,7 @@ export const useRemovePhoto = () =>
     optimisticRemove
   )
 
-const optimisticUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
+const eagerUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
   onSuccess: (item: S) => {
     queryCache.setQueryData(key, (old: S[] | undefined) => old ? [...old, item] : [item])
   },
@@ -130,50 +130,35 @@ const optimisticUpload = <T, S extends Saved>(key: any): MutationConfig<S, strin
 
 const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, string, S, S[]> => ({
   onMutate: (item) => {
-    queryCache.cancelQueries();
     const old = queryCache.getQueryData(key) as S[];
     queryCache.setQueryData(key, (old: S[] | undefined) => old?.filter(t => t.id !== item.id) || [])
     return old;
   },
 
-  onSuccess: () => {
-    queryCache.invalidateQueries(key);
-  },
-
   onError: (_error, _item, old) => {
     queryCache.setQueryData(key, old);
   },
-
-  throwOnError: true,
 });
 
-const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+const optimisticAdd: MutationConfig<void, string, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
-    queryCache.cancelQueries();
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
     queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, { 
       photos: { 
-        $push: ([photo]) 
+        $push: [photo] 
       } 
     }))
     return old;
   },
 
-  onSuccess: ({ albumId }) => {
-    queryCache.invalidateQueries(['albums', albumId]);
-  },
-
   onError: (_error, { albumId }, old) => {
     queryCache.setQueryData(['album', albumId], old);
   },
-
-  throwOnError: true,
 };
 
-const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+const optimisticRemove: MutationConfig<void, string, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
-    queryCache.cancelQueries();
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
     queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, {
@@ -184,13 +169,7 @@ const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbu
     return old;
   },
 
-  onSuccess: ({ albumId }) => {
-    queryCache.invalidateQueries(['album', albumId]);
-  },
-
   onError: (_error, { albumId }, old) => {
     queryCache.setQueryData(['album', albumId], old);
   },
-
-  throwOnError: true,
 };

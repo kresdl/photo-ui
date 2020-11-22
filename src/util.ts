@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials, Titled, Assignment } from './types'
+import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials, Titled } from './types'
 
 export const byTitle = (a: Titled, b: Titled) => 
   a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
@@ -64,13 +64,13 @@ export const addPhotoToAlbum = (photo: number, album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
   method: 'PUT',
   token: getToken()
-}) as Promise<Assignment>
+})
 
 export const removePhotoFromAlbum = (photo: number, album: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/albums/${album}/${photo}`,
   method: 'DELETE',
   token: getToken()
-}) as Promise<Assignment>
+})
 
 export const deletePhoto = (photo: number) => io({
   url: `http://fed19-peterh-photo.herokuapp.com/photos/${photo}`,
@@ -93,8 +93,8 @@ type IOOptions = {
 
 type Type = (opt: IOOptions) => Promise<any>
 
-const mapFail = (res: any) => 
-  Array.isArray(res) ? res.map(item => item.msg) : res
+const error = (res: any) => 
+  Array.isArray(res) ? new AggregateError(res.map(Error)) : Error(res)
 
 export const io: Type = ({ url, method = 'GET', data, token }) =>
   new Promise(async (resolve, reject) => {
@@ -111,13 +111,13 @@ export const io: Type = ({ url, method = 'GET', data, token }) =>
       const results = await response.json()
 
       if (results.status === 'error') {
-        reject(mapFail(results.status))
+        reject(error(results.message))
       } else if (results.status === 'fail') {
-        reject(mapFail(results.data))
+        reject(error(results.data))
       } else {
         resolve(results.data)
       }
     } catch (err) {
-      reject('Network error')
+      reject(Error('Network error'))
     }
   });

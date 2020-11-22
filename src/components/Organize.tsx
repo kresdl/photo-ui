@@ -17,21 +17,15 @@ const Organize: React.FC = () => {
   const albums = useAlbums()
   const album = useAlbum(albumId)
 
-  const [
-    addPhoto, 
-    {
-      error: addErr,
-      reset: resetAdd
-    }
-   ] = useAddPhoto()
+  const [addPhoto, {
+    error: addErr,
+    reset: resetAdd
+  }] = useAddPhoto()
 
-  const [
-    removePhoto,
-    {
-      error: removeErr,
-      reset: resetRemove
-    },
-   ] = useRemovePhoto()
+  const [removePhoto, {
+    error: removeErr,
+    reset: resetRemove
+  }] = useRemovePhoto()
 
   useEffect(() => {
     albums.data?.length && setAlbumId(albums.data[0].id)
@@ -51,8 +45,6 @@ const Organize: React.FC = () => {
     reset()
     removePhoto({ photo, albumId: albumId! })
   }
-
-  console.log(addErr)
 
   const hasPhotos = photos.data?.length || null,
     hasAlbums = albums.data?.length || null,

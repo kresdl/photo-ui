@@ -26,7 +26,7 @@ const AlbumEditor: React.FC = () => {
           <span>Albums</span>
           <small className="float-right text-secondary">
             {
-              albums.msg || albums.error || deleteErr
+              albums.msg?.toString() || albums.error?.toString() || deleteErr?.toString()
               || (albums.data?.length && 'Delete') || 'No albums'
             }
           </small>
