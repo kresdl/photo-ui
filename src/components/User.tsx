@@ -2,8 +2,9 @@ import React from 'react'
 import Sidebar from './Sidebar'
 import UserRouter from './UserRouter'
 import styled from 'styled-components'
-import { useLogout, useAuth } from '../hooks'
+import { useLogout } from '../lib/hooks'
 import { useHistory } from 'react-router-dom'
+import store from '../lib/store'
 
 const Wrapper = styled.div`
   @media screen and (min-width: 768px) {
@@ -13,8 +14,7 @@ const Wrapper = styled.div`
 
 const User: React.FC = () => {
   const history = useHistory()
-  const [auth] = useAuth()
-  if (!auth) history.push('/')
+  if (!store.auth) history.push('/')
   
   useLogout('/user/logout', '/')
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Photos from './Photos'
 import AlbumSelect from './AlbumSelect'
-import { byTitle } from '../util'
-import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../hooks'
+import { byTitle } from '../lib/util'
+import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../lib/hooks'
 import { SavedPhoto } from '../types'
 
 const Organize: React.FC = () => {
@@ -52,11 +52,11 @@ const Organize: React.FC = () => {
     removePhoto({ photo, albumId: albumId! })
   }
 
-  console.log(addErr)
-
   const hasPhotos = photos.data?.length || null,
     hasAlbums = albums.data?.length || null,
     albumHasPhotos = album.data?.photos.length || null
+
+  console.log(1)
 
   return (
     <div className="row">

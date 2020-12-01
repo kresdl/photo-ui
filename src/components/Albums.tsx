@@ -1,5 +1,5 @@
 import React from 'react'
-import Album from './Album'
+import Record from './AlbumRecord'
 import { SavedAlbum } from '../types'
 import Selectable from './Selectable'
 
@@ -12,7 +12,7 @@ type Props = {
 const Albums: React.FC<Props> = props =>
   <Selectable {...props}>
     {
-      item => <Album {...item} />
+      item => <Record {...item} />
     }
   </Selectable>
 

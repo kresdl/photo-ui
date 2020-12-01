@@ -1,55 +1,27 @@
 /* eslint-disable no-throw-literal */
-import { useContext, useCallback, useEffect, useLayoutEffect } from 'react'
-import MessageContext from './components/MessageContext'
-import { Assignment, Message, Saved, SavedAlbum, SavedPhoto } from './types'
+import { useEffect } from 'react'
+import { Assignment, Saved, SavedAlbum, SavedPhoto } from '../types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
   removePhotoFromAlbum, deletePhoto, deleteAlbum, uploadAlbum, uploadPhoto
 } from './util'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
-import AuthContext from './components/AuthContext'
 import update from 'immutability-helper'
-
-export const useAuth = () => useContext(AuthContext)!
-
-export const useNotify = () => {
-  const [msg, setMsg] = useContext(MessageContext)!
-
-  return {
-    msg,
-    notify: useCallback((msg: Message) => {
-      const m = [] as string[]
-      setMsg(msg ? m.concat(msg) : m)
-    }, [setMsg])
-  }
-}
-
-export const useRouteMessage = () => {
-  const { pathname, state } = useLocation<Message>()
-  const { msg, notify } = useNotify()
-
-  useLayoutEffect(
-    () => notify(state),
-    [pathname, state, notify]
-  )
-
-  return msg
-}
+import store from './store'
 
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),
-    { pathname } = useLocation(),
-    [, setAuth] = useAuth()
+    { pathname } = useLocation()
 
   useEffect(() => {
     if (pathname === path) {
       sessionStorage.removeItem('token')
-      setAuth(null)
+      store.setAuth(null)
       queryCache.clear()
       history.push(redirect)
     }
-  }, [setAuth, path, redirect, history, pathname])
+  }, [path, redirect, history, pathname])
 }
 
 type StatusMsg = Partial<Record<QueryStatus, string>>
@@ -91,10 +63,10 @@ export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum
   useIndexedSync('album', id, downloadAlbum, { loading: 'Downloading album...' }, config)
 
 export const useUploadPhoto = () =>
-  useMutation(uploadPhoto, optimisticUpload('photos'))
+  useMutation(uploadPhoto, eagerUpload('photos'))
 
 export const useUploadAlbum = () =>
-  useMutation(uploadAlbum, optimisticUpload('albums'))
+  useMutation(uploadAlbum, eagerUpload('albums'))
 
 export const useDeletePhoto = () =>
   useMutation(
@@ -120,7 +92,7 @@ export const useRemovePhoto = () =>
     optimisticRemove
   )
 
-const optimisticUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
+const eagerUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
   onSuccess: (item: S) => {
     queryCache.setQueryData(key, (old: S[] | undefined) => old ? [...old, item] : [item])
   },
@@ -130,14 +102,9 @@ const optimisticUpload = <T, S extends Saved>(key: any): MutationConfig<S, strin
 
 const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, string, S, S[]> => ({
   onMutate: (item) => {
-    queryCache.cancelQueries();
     const old = queryCache.getQueryData(key) as S[];
     queryCache.setQueryData(key, (old: S[] | undefined) => old?.filter(t => t.id !== item.id) || [])
     return old;
-  },
-
-  onSuccess: () => {
-    queryCache.invalidateQueries(key);
   },
 
   onError: (_error, _item, old) => {
@@ -149,7 +116,6 @@ const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, string, 
 
 const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
-    queryCache.cancelQueries();
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
     queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, { 
@@ -158,10 +124,6 @@ const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> 
       } 
     }))
     return old;
-  },
-
-  onSuccess: ({ albumId }) => {
-    queryCache.invalidateQueries(['albums', albumId]);
   },
 
   onError: (_error, { albumId }, old) => {
@@ -173,7 +135,6 @@ const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> 
 
 const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
-    queryCache.cancelQueries();
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
     queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, {
@@ -182,10 +143,6 @@ const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbu
       }
     }))
     return old;
-  },
-
-  onSuccess: ({ albumId }) => {
-    queryCache.invalidateQueries(['album', albumId]);
   },
 
   onError: (_error, { albumId }, old) => {

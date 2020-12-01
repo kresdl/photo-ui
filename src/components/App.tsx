@@ -1,21 +1,25 @@
-import React, { useState } from 'react'
-import MsgCtx from './MessageContext'
-import AuthCtx from './AuthContext'
+import React, { useEffect } from 'react'
 import MainRouter from './MainRouter'
+import firebase from 'firebase/app'
+import store from '../lib/store'
 
 const App: React.FC = () => {
-  const messaging = useState<string[]>([])
-  const token = sessionStorage.getItem('token')
-  const auth = useState<string | null>(token)
+  useEffect(() => {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDiv59wTyuGwLurgRsAsk6Mms2f7lN9qNU",
+      authDomain: "sven-f425f.firebaseapp.com",
+      databaseURL: "https://sven-f425f.firebaseio.com",
+      projectId: "sven-f425f",
+      storageBucket: "sven-f425f.appspot.com",
+      messagingSenderId: "430853368900",
+      appId: "1:430853368900:web:6be47276e3c9ccd439e011"
+    });
+  }, [])
 
   return (
-    <AuthCtx.Provider value={auth}>
-      <MsgCtx.Provider value={messaging}>
-        <div className="container-fluid p-0">
-          <MainRouter />
-        </div>
-      </MsgCtx.Provider>
-    </AuthCtx.Provider>
+      <div className="container-fluid p-0">
+        <MainRouter />
+      </div>
   )
 }
 

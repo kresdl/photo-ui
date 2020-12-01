@@ -2,15 +2,12 @@ import React from 'react'
 import Field from './Field'
 import Submit from './Submit'
 import { Link, useHistory } from 'react-router-dom'
-import { login } from '../util'
-import { useNotify } from '../hooks'
+import { login } from '../lib/util'
 import { queryCache } from 'react-query'
-import { useAuth } from '../hooks'
+import store from '../lib/store'
 
 const Login: React.FC = () => {
   const history = useHistory()
-  const { notify } = useNotify()
-  const [,setAuth] = useAuth()
 
   const submit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
@@ -18,16 +15,16 @@ const Login: React.FC = () => {
       { value: email } = elements.namedItem('email') as HTMLInputElement,
       { value: password } = elements.namedItem('password') as HTMLInputElement
 
-    notify('Attempting to log in...')
+    store.notify('Attempting to log in...')
 
     try {
       const token = await login({ email, password }) as string
       sessionStorage.setItem('token', token)
-      setAuth(token)
+      store.setAuth(token)
       queryCache.clear()
       history.push('/user')
     } catch (err) {
-      notify(err)
+      store.notify(err)
     }
   }
 

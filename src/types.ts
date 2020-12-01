@@ -1,6 +1,12 @@
 import { TransitionStatus } from "react-transition-group/Transition"
 
-export type Message = string[] | string | null | undefined
+export type Stylable = {
+  className?: string;
+};
+
+export type Extend<T extends HTMLElement> = React.HTMLProps<T> & React.HTMLAttributes<T>;
+
+export type Message = string[] | string | null
 
 export type Saved = { 
   id: number

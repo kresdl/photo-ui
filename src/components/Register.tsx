@@ -2,21 +2,19 @@ import React, { useState, ChangeEvent } from 'react'
 import Field from './Field'
 import SubmitCancel from './SubmitCancel'
 import { useHistory } from 'react-router-dom'
-import { register } from '../util'
-import { useNotify } from '../hooks'
+import { register } from '../lib/util'
 import { Message } from '../types'
+import store from '../lib/store'
 
 const Register: React.FC = () => {
   const [pwSync, setPwSync] = useState(true),
     history = useHistory<Message>(),
-    { notify } = useNotify(),
-
     cancel = () => history.push('/'),
 
     submit: React.FormEventHandler<HTMLFormElement> = async e => {
       e.preventDefault()
 
-      if (!pwSync) return notify('Password mismatch')
+      if (!pwSync) return store.notify('Password mismatch')
 
       const { elements } = e.target as HTMLFormElement,
         { value: first_name } = elements.namedItem('first-name') as HTMLInputElement,
@@ -24,13 +22,13 @@ const Register: React.FC = () => {
         { value: email } = elements.namedItem('email') as HTMLInputElement,
         { value: password } = elements.namedItem('password') as HTMLInputElement
 
-      notify('Registering...')
+      store.notify('Registering...')
 
       try {
         await register({ first_name, last_name, email, password })
         history.push('/', 'Register successful!')
       } catch (err) {
-        notify(err)
+        store.notify(err)
       }
     },
 

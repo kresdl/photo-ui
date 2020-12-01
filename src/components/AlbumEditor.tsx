@@ -1,14 +1,16 @@
 import React from 'react'
 import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
-import { byTitle } from '../util'
-import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../hooks'
+import { byTitle } from '../lib/util'
+import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../lib/hooks'
 
 const AlbumEditor: React.FC = () => {
   const albums = useAlbums()
 
   const [deleteAlbum, { error: deleteErr }] = useDeleteAlbum()
   const [uploadAlbum, { error: uploadErr }] = useUploadAlbum()
+
+  console.log(3)
 
   return (
     <div className="row">

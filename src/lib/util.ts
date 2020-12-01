@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials, Titled, Assignment } from './types'
+import { Photo, Album, SavedAlbum, SavedPhoto, Register, Credentials, Titled, Assignment } from '../types'
 
 export const byTitle = (a: Titled, b: Titled) => 
   a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1

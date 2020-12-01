@@ -1,5 +1,5 @@
 import React from 'react'
-import Photo from './Photo'
+import Record from './PhotoRecord'
 import { SavedPhoto } from '../types'
 import Selectable from './Selectable'
 
@@ -12,7 +12,7 @@ type Props = {
 const Photos: React.FC<Props> = props =>
   <Selectable {...props}>
     {
-      item => <Photo {...item} />
+      item => <Record {...item} />
     }
   </Selectable>
 
