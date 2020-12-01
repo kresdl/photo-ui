@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer, useRef } from 'react'
 import Field from './Field'
 import Submit from './Submit'
 import { Photo, SavedPhoto } from '../types'
@@ -7,6 +7,7 @@ import Attachment from './Attachment'
 import firebase from 'firebase/app'
 import 'firebase/storage'
 import ProgressBar from './ProgressBar'
+import { useMounted } from '../lib/hooks'
 
 type State = {
   file?: File | null
@@ -36,6 +37,7 @@ type Props = {
 }
 
 const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
+  const mounted = useMounted()
   const [{ file, progress, error }, dispatch] = useReducer(reducer, {})
 
   const select = (file: File) => {
@@ -60,12 +62,13 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       firebase.storage.TaskEvent.STATE_CHANGED,
       
       snapshot => {
+        if (!mounted.current) return
         const progress = snapshot.bytesTransferred / snapshot.totalBytes
         dispatch({ type: 'progress', progress })
       },
 
       error => {
-        dispatch({ type: 'error', error })
+        mounted.current && dispatch({ type: 'error', error })
       },
 
       async () => {
@@ -75,6 +78,8 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
             url: await task.snapshot.ref.getDownloadURL(),
             title, comment
           })
+
+          if (!mounted.current) return;
 
           form.reset()
           titleEm.focus()

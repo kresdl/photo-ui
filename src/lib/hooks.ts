@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Assignment, Saved, SavedAlbum, SavedPhoto } from '../types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
@@ -9,6 +9,19 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
 import update from 'immutability-helper'
 import store from './store'
+
+export const useMounted = () => {
+  const mount = useRef(false)
+  useEffect(() => {
+    mount.current = true
+
+    return () => { 
+      mount.current = false
+    }
+   }, [])
+
+  return mount;
+}
 
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),
