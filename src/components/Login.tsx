@@ -1,5 +1,5 @@
 import React from 'react'
-import Field from './Field'
+import Input from './Input'
 import Submit from './Submit'
 import { Link, useHistory } from 'react-router-dom'
 import { login } from '../lib/util'
@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     store.notify('Attempting to log in...')
 
     try {
-      const token = await login({ email, password }) as string
+      const token = await login({ email, password })
       sessionStorage.setItem('token', token)
       store.setAuth(token)
       queryCache.clear()
@@ -31,8 +31,8 @@ const Login: React.FC = () => {
   return (
     <>
       <form onSubmit={submit}>
-        <Field>Email</Field>
-        <Field type="password">Password</Field>
+        <Input type="email" required name="email" label="Email" />
+        <Input type="password" required name="password" label="Password" />
         <Submit>Login</Submit>
       </form>
       <Link className="d-block form-group" to="/register">Register</Link>

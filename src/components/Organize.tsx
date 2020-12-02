@@ -56,8 +56,6 @@ const Organize: React.FC = () => {
     hasAlbums = albums.data?.length || null,
     albumHasPhotos = album.data?.photos.length || null
 
-  console.log(1)
-
   return (
     <div className="row">
       <div className="col-lg-6 pb-3 pb-lg-0">
@@ -65,7 +63,7 @@ const Organize: React.FC = () => {
           <span>Photos</span>
           <small className="float-right text-secondary">
             {
-              photos.msg || photos.error || addErr
+              photos.msg || photos.error?.message || addErr?.message
               || (hasPhotos && 'Add to album') || 'No photos'
             }
           </small>
@@ -77,7 +75,7 @@ const Organize: React.FC = () => {
           <span>Album</span>
           <small className="float-right text-secondary">
             {
-              albums.msg || albums.error || (!hasAlbums && 'No albums')
+              albums.msg || albums.error?.message || (!hasAlbums && 'No albums')
             }
           </small>
         </h5>
@@ -95,7 +93,7 @@ const Organize: React.FC = () => {
                   <span>Photos</span>
                   <small className="float-right text-secondary">
                     {
-                      album.msg || album.error || removeErr
+                      album.msg || album.error?.message || removeErr?.message
                       || (albumHasPhotos && 'Remove from album') || 'No photos'
                     }
                   </small>

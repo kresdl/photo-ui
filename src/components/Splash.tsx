@@ -2,6 +2,7 @@ import React from 'react'
 import SplashRouter from './SplashRouter'
 import styled from 'styled-components'
 import store from '../lib/store'
+import { observer } from 'mobx-react-lite'
 
 const H1 = styled.h1`
   font-size: 4rem;
@@ -14,6 +15,8 @@ const Center = styled.main`
 const Splash: React.FC = () => {
 //  const msg = useRouteMessage()
 
+  console.log(store.message)
+
   return (
     <>
       <header className="jumbotron">
@@ -22,10 +25,10 @@ const Splash: React.FC = () => {
       </header>
       <Center className="mx-auto pt-5">
         <SplashRouter />
-        {/*<p className="pt-3">{msg}</p>*/}
+        <p className="pt-3">{store.message}</p>
       </Center>
     </>
   )
 }
 
-export default Splash
+export default observer(Splash)

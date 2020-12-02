@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import MainRouter from './MainRouter'
 import firebase from 'firebase/app'
-import store from '../lib/store'
 
 const App: React.FC = () => {
   useEffect(() => {

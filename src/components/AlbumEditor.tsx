@@ -10,15 +10,13 @@ const AlbumEditor: React.FC = () => {
   const [deleteAlbum, { error: deleteErr }] = useDeleteAlbum()
   const [uploadAlbum, { error: uploadErr }] = useUploadAlbum()
 
-  console.log(3)
-
   return (
     <div className="row">
       <div className="col-lg-6">
         <h5 className="mb-4">
           <span>Upload album</span>
           <small className="float-right text-secondary">
-            {uploadErr}
+            {uploadErr?.message}
           </small>
         </h5>
         <UploadAlbum onUpload={uploadAlbum} />
@@ -28,7 +26,7 @@ const AlbumEditor: React.FC = () => {
           <span>Albums</span>
           <small className="float-right text-secondary">
             {
-              albums.msg || albums.error || deleteErr
+              albums.msg || albums.error?.message || deleteErr?.message
               || (albums.data?.length && 'Delete') || 'No albums'
             }
           </small>

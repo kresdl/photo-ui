@@ -24,7 +24,7 @@ const PhotoEditor: React.FC = () => {
         <h5 className="mb-4">
           <span>Upload photo</span>
           <small className="float-right text-secondary">
-            {uploadErr}
+            {uploadErr?.message}
           </small>
         </h5>
         <UploadPhoto onUpload={uploadPhoto} />
@@ -34,7 +34,7 @@ const PhotoEditor: React.FC = () => {
           <span>Photos</span>
           <small className="float-right text-secondary">
             {
-              photos.msg || photos.error || deleteErr
+              photos.msg || photos.error?.message || deleteErr?.message
               || (photos.data?.length && 'Delete') || 'No photos'
             }
           </small>

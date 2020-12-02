@@ -1,5 +1,5 @@
-import React, { useEffect, useReducer, useRef } from 'react'
-import Field from './Field'
+import React, { useReducer } from 'react'
+import Input from './Input'
 import Submit from './Submit'
 import { Photo, SavedPhoto } from '../types'
 import FileInput from './FileInput'
@@ -51,20 +51,20 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
       { elements } = form,
       titleEm = elements.namedItem('title') as HTMLInputElement,
       { value: title } = titleEm,
-      { value: comment } = elements.namedItem('comment') as HTMLInputElement
-
-    const ref = firebase.storage().ref()
-    const res = ref.child(file?.name!)
-
-    const task = res.put(file!);
+      { value: comment } = elements.namedItem('comment') as HTMLInputElement,
+      ref = firebase.storage().ref(),
+      res = ref.child(file?.name!),
+      task = res.put(file!)
 
     task.on(
       firebase.storage.TaskEvent.STATE_CHANGED,
       
       snapshot => {
         if (!mounted.current) return
-        const progress = snapshot.bytesTransferred / snapshot.totalBytes
-        dispatch({ type: 'progress', progress })
+        dispatch({ 
+          type: 'progress', 
+          progress: snapshot.bytesTransferred / snapshot.totalBytes
+        })
       },
 
       error => {
@@ -93,20 +93,19 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
     )
   }
 
+  const uploading = typeof progress === 'number'
+
   return (
     <form onSubmit={submit}>
       <div className="form-group">
         <FileInput required onPick={select} />
         {file && <Attachment ml="1rem" file={file} />}
       </div>
-      <Field autoFocus={true}>Title</Field>
-      <Field optional id="comment">Comment (optional)</Field>
+      <Input autoComplete="off" required autoFocus={true} name="title" label="Title" />
+      <Input autoComplete="off" name="comment" label="Comment (optional)" />
       <Submit>Upload</Submit>
       {error && <p>{error.message}</p>}
-      {typeof progress === 'number'
-        ? <ProgressBar progress={progress} />
-        : null
-      }
+      {uploading && <ProgressBar progress={progress!} />}
     </form>
   )
 }

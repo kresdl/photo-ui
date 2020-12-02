@@ -1,15 +1,22 @@
-import React, { useState, ChangeEvent } from 'react'
-import Field from './Field'
+import React, { useEffect, useState, ChangeEvent } from 'react'
+import Input from './Input'
 import SubmitCancel from './SubmitCancel'
 import { useHistory } from 'react-router-dom'
 import { register } from '../lib/util'
-import { Message } from '../types'
 import store from '../lib/store'
 
 const Register: React.FC = () => {
+  useEffect(
+    () => void store.notify(null), []
+  )
+
   const [pwSync, setPwSync] = useState(true),
-    history = useHistory<Message>(),
-    cancel = () => history.push('/'),
+    history = useHistory<string>(),
+
+    cancel = () => {
+      store.notify(null)
+      history.push('/')
+    },
 
     submit: React.FormEventHandler<HTMLFormElement> = async e => {
       e.preventDefault()
@@ -26,14 +33,17 @@ const Register: React.FC = () => {
 
       try {
         await register({ first_name, last_name, email, password })
-        history.push('/', 'Register successful!')
+        store.notify('Register successful!')
+        history.push('/')
       } catch (err) {
         store.notify(err)
       }
     },
 
     pwProps = {
-      type: "password",
+      autoComplete: 'off',
+      required: true,
+      type: 'password',
       invalid: !pwSync,
 
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
@@ -46,11 +56,11 @@ const Register: React.FC = () => {
 
   return (
     <form onSubmit={submit}>
-      <Field>First name</Field>
-      <Field>Last name</Field>
-      <Field type="email">Email</Field>
-      <Field {...pwProps}>Password</Field>
-      <Field {...pwProps}>Repeat password</Field>
+      <Input autoComplete="off" required name="first-name" label="First name" />
+      <Input autoComplete="off" required name="last-name" label="Last name" />
+      <Input autoComplete="off" required type="email" name="email" label="Email" />
+      <Input {...pwProps} autoComplete="off" required name="password" label="Password" />
+      <Input {...pwProps} autoComplete="off" required label="Repeat password" />
       <SubmitCancel ok="Register" onCancel={cancel} />
     </form>
   )

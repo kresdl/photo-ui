@@ -23,17 +23,17 @@ type Props = {
 
 const Attachment: React.FC<Props & Stylable> = ({ file, className }) => {
     const [url, setUrl] = useState<string | undefined>()
-    const revoke = () => url && URL.revokeObjectURL(url);
 
     useEffect(() => {
-        setUrl(URL.createObjectURL(file));
-        return () => void revoke();
+        const t = URL.createObjectURL(file);
+        setUrl(t)
+        return () => void URL.revokeObjectURL(t);
     }, [file]);
 
+    if (!url) return null
+
     return (
-        url 
-        ? <Div className={className} url={url} />
-        : null
+        <Div className={className} url={url} />
     )
 }
 

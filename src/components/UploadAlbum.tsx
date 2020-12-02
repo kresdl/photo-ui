@@ -1,5 +1,5 @@
 import React from 'react'
-import Field from './Field'
+import Input from './Input'
 import Submit from './Submit'
 import { Album, SavedAlbum } from '../types'
 
@@ -24,7 +24,7 @@ const UploadAlbum: React.FC<Props> = ({ onUpload }) => {
 
   return (
     <form onSubmit={submit}>
-      <Field autoFocus={true}>Title</Field>
+      <Input autoFocus={false} label="Title" required />
       <Submit>Upload</Submit>
     </form>
   )

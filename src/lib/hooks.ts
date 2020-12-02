@@ -43,7 +43,7 @@ const useSync = <T>(
   key: string,
   task: () => Promise<T>,
   msg: StatusMsg,
-  config?: QueryConfig<T, string>
+  config?: QueryConfig<T, Error>
 ) => {
   const { status, ...rest } = useQuery(key, task, config)
 
@@ -55,7 +55,7 @@ const useIndexedSync = <T>(
   index: any,
   task: (id: number) => Promise<T>,
   msg: StatusMsg,
-  config?: QueryConfig<T, string>
+  config?: QueryConfig<T, Error>
 ) => {
   const { status, ...rest } = useQuery(
     [key, index],
@@ -66,13 +66,13 @@ const useIndexedSync = <T>(
   return { ...rest, status, msg: msg[status] }
 }
 
-export const usePhotos = (config?: QueryConfig<SavedPhoto[], string>) =>
+export const usePhotos = (config?: QueryConfig<SavedPhoto[], Error>) =>
   useSync('photos', downloadPhotos, { loading: 'Downloading photos...' }, config)
 
-export const useAlbums = (config?: QueryConfig<SavedAlbum[], string>) =>
+export const useAlbums = (config?: QueryConfig<SavedAlbum[], Error>) =>
   useSync('albums', downloadAlbums, { loading: 'Downloading albums...' }, config)
 
-export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum, string>) =>
+export const useAlbum = (id: number | undefined, config?: QueryConfig<SavedAlbum, Error>) =>
   useIndexedSync('album', id, downloadAlbum, { loading: 'Downloading album...' }, config)
 
 export const useUploadPhoto = () =>
@@ -105,7 +105,7 @@ export const useRemovePhoto = () =>
     optimisticRemove
   )
 
-const eagerUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T, S[]> => ({
+const eagerUpload = <T, S extends Saved>(key: any): MutationConfig<S, Error, T, S[]> => ({
   onSuccess: (item: S) => {
     queryCache.setQueryData(key, (old: S[] | undefined) => old ? [...old, item] : [item])
   },
@@ -113,40 +113,38 @@ const eagerUpload = <T, S extends Saved>(key: any): MutationConfig<S, string, T,
   throwOnError: true,
 });
 
-const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, string, S, S[]> => ({
+const optimisticDelete = <S extends Saved>(key: any): MutationConfig<S, Error, S, S[]> => ({
   onMutate: (item) => {
     const old = queryCache.getQueryData(key) as S[];
     queryCache.setQueryData(key, (old: S[] | undefined) => old?.filter(t => t.id !== item.id) || [])
     return old;
   },
 
-  onError: (_error, _item, old) => {
-    queryCache.setQueryData(key, old);
+  onError: (error, _item, old) => {
+    if (error.name !== 'fail')
+      queryCache.setQueryData(key, old);
   },
-
-  throwOnError: true,
 });
 
-const optimisticAdd: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+const optimisticAdd: MutationConfig<Assignment, Error, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
     queryCache.setQueryData(key, (old: SavedAlbum | undefined) => update(old!, { 
       photos: { 
-        $push: ([photo]) 
+        $apply: (photos: SavedPhoto[]) => photos.find(p => p.id === photo.id) ? photos : [...photos, photo]
       } 
     }))
     return old;
   },
 
-  onError: (_error, { albumId }, old) => {
-    queryCache.setQueryData(['album', albumId], old);
+  onError: (error, { albumId }, old) => {
+    if (error.name !== 'fail')
+      queryCache.setQueryData(['album', albumId], old);
   },
-
-  throwOnError: true,
 };
 
-const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbum> = {
+const optimisticRemove: MutationConfig<Assignment, Error, Assignment, SavedAlbum> = {
   onMutate: ({ albumId, photo }) => {
     const key = ['album', albumId];
     const old = queryCache.getQueryData(key) as SavedAlbum;
@@ -158,9 +156,8 @@ const optimisticRemove: MutationConfig<Assignment, string, Assignment, SavedAlbu
     return old;
   },
 
-  onError: (_error, { albumId }, old) => {
-    queryCache.setQueryData(['album', albumId], old);
+  onError: (error, { albumId }, old) => {
+    if (error.name !== 'fail')
+      queryCache.setQueryData(['album', albumId], old);
   },
-
-  throwOnError: true,
 };

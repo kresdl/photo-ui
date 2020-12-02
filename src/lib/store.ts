@@ -1,15 +1,23 @@
-import { action, observable } from "mobx";
-
-import firebase from 'firebase/app'
-import { Message } from "../types";
+import { action, observable, makeObservable } from 'mobx';
+import AggregateError from 'aggregate-error'
 
 class Store {
-    storage: firebase.storage.Reference | null = null
+    constructor() {
+        makeObservable(this)
+    }
 
     @action
-    notify(msg?: Message) {
-        const m = [] as string[]
-        this.message = msg?.length ? m.concat(msg) : m
+    notify(msg: string | Error | AggregateError | null) {
+        if (!msg) {
+            this.message = [];
+        } else if (typeof msg === 'string') {
+            this.message = [msg]
+        } else if (msg instanceof AggregateError) {
+            this.message = [...msg].map((e: Error) => e.message)
+        } else {
+            this.message = [msg.message]
+        }
+        console.log(this.message)
     }
 
     @action
