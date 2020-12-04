@@ -26,6 +26,7 @@ export type Titled = {
 
 export type Photo = Titled & {
   url: string,
+  path: string
   comment?: string
 }
 

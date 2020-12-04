@@ -7,6 +7,9 @@ import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.css'
 import { ReactQueryDevtools } from 'react-query-devtools'
 
+import svg from '!!raw-loader!./logo.svg';
+console.log(svg);
+
 ReactDOM.render(
   <>
     <React.StrictMode>

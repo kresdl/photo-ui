@@ -1,6 +1,5 @@
 import { action, observable, makeObservable } from 'mobx';
 import AggregateError from 'aggregate-error'
-
 class Store {
     constructor() {
         makeObservable(this)
@@ -17,7 +16,6 @@ class Store {
         } else {
             this.message = [msg.message]
         }
-        console.log(this.message)
     }
 
     @action

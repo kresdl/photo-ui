@@ -1,27 +1,22 @@
 import styled from '@emotion/styled'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
-import { Stylable } from '../types'
-import { space } from 'styled-system'
 
 const Div = styled.div<{ url: string }>`
-    display: inline-block;
-    vertical-align: middle;
     background-image: url(${p => p.url});
     background-size: contain;
     background-repeat: no-repeat;
     background-color: black;
     background-position: center;
-    width: 60px;
-    height: 60px;
-    position: relative;
+    width: 256px;
+    height: 256px;
 `
 
 type Props = {
     file: File;
 }
 
-const Attachment: React.FC<Props & Stylable> = ({ file, className }) => {
+const Attachment: React.FC<Props> = ({ file }) => {
     const [url, setUrl] = useState<string | undefined>()
 
     useEffect(() => {
@@ -33,8 +28,10 @@ const Attachment: React.FC<Props & Stylable> = ({ file, className }) => {
     if (!url) return null
 
     return (
-        <Div className={className} url={url} />
+        <div className="form-group">
+            <Div url={url} />
+        </div>
     )
 }
 
-export default styled(Attachment)(space)
+export default Attachment

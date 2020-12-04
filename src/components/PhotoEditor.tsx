@@ -13,9 +13,8 @@ const PhotoEditor: React.FC = () => {
   const [uploadPhoto, { error: uploadErr }] = useUploadPhoto()
 
   const discard = async (item: SavedPhoto) => {
-    const path = item.url.match(/appspot.com\/o\/([^/?]*)/)?.[1]
     deletePhoto(item)
-    firebase.storage().ref(path).delete()
+    firebase.storage().ref(item.path).delete()
   }
 
   return (
@@ -29,7 +28,7 @@ const PhotoEditor: React.FC = () => {
         </h5>
         <UploadPhoto onUpload={uploadPhoto} />
       </div>
-      <div className="col-lg-6">
+      <div className="col-lg-6 pt-5 pt-lg-0">
         <h5 className="mb-4">
           <span>Photos</span>
           <small className="float-right text-secondary">

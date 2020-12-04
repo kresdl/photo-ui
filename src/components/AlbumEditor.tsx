@@ -21,7 +21,7 @@ const AlbumEditor: React.FC = () => {
         </h5>
         <UploadAlbum onUpload={uploadAlbum} />
       </div>
-      <div className="col-lg-6">
+      <div className="col-lg-6 pt-5 pt-lg-0">
         <h5 className="mb-4">
           <span>Albums</span>
           <small className="float-right text-secondary">

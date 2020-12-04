@@ -14,10 +14,12 @@ const FileInput: React.FC<Props & Extend<HTMLInputElement>> = ({ onPick, ...prop
     }
 
     return (
-        <label>
-            <input type="file" className="d-none" onChange={change} {...props} />
-            <span className="btn btn-secondary">Select file...</span>
-        </label>
+        <div className="form-group">
+            <label className="mb-0">
+                <input type="file" className="d-none" onChange={change} {...props} />
+                <span className="btn btn-secondary">Select file...</span>
+            </label>
+        </div>
     )
 }
 

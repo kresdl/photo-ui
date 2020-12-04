@@ -59,7 +59,7 @@ const Register: React.FC = () => {
       <Input autoComplete="off" required name="first-name" label="First name" />
       <Input autoComplete="off" required name="last-name" label="Last name" />
       <Input autoComplete="off" required type="email" name="email" label="Email" />
-      <Input {...pwProps} autoComplete="off" required name="password" label="Password" />
+      <Input {...pwProps} autoComplete="off" required name="password" label="Password (5 characters minimum)" pattern=".{5,}"/>
       <Input {...pwProps} autoComplete="off" required label="Repeat password" />
       <SubmitCancel ok="Register" onCancel={cancel} />
     </form>

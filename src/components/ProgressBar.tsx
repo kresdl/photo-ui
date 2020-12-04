@@ -9,8 +9,8 @@ const ProgressBar: React.FC<Props> = ({ progress }) => {
     const style = { width: prog + '%' }
 
     return (
-        <div className="progress">
-          <div className="progress-bar bg-success" role="progressbar" style={style} aria-Valuenow={prog} aria-Valuemin={0} aria-Valuemax={100} />
+        <div className="form-group progress">
+          <div className="progress-bar bg-success" role="progressbar" style={style} aria-valuenow={prog} aria-valuemin={0} aria-valuemax={100} />
         </div>
     )
 }

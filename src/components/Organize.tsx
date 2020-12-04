@@ -70,7 +70,7 @@ const Organize: React.FC = () => {
         </h5>
         <Photos items={photos.data} onSelect={add} disabled={!hasAlbums} />
       </div>
-      <div className="col-lg-6">
+      <div className="col-lg-6 pt-5 pt-lg-0">
         <h5 className="mb-4">
           <span>Album</span>
           <small className="float-right text-secondary">

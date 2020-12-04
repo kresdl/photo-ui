@@ -21,6 +21,7 @@ const Login: React.FC = () => {
       const token = await login({ email, password })
       sessionStorage.setItem('token', token)
       store.setAuth(token)
+      store.notify(null)
       queryCache.clear()
       history.push('/user')
     } catch (err) {
