@@ -49,4 +49,4 @@ const UploadPhoto: React.FC<Props> = ({ onUpload }) => {
   )
 }
 
-export default UploadPhoto
+export default UploadPhoto 
