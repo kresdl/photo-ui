@@ -1,8 +1,7 @@
-import React, { useCallback, useRef } from 'react'
+import React, { CSSProperties, useCallback, useRef } from 'react'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import { TransitionStatus } from 'react-transition-group/Transition'
 import { TransitionGroupProps } from 'react-transition-group/TransitionGroup'
-import { CSSProperties } from 'styled-components'
 import { Saved, HasClientHeight } from '../types'
 
 type TransitionStyles = Partial<Record<TransitionStatus, CSSProperties>>

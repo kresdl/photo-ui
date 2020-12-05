@@ -7,8 +7,10 @@ import { State } from './types';
 import { CSSProperties } from 'react';
 import touchDetect from './touch-detect';
 import fwdIcon from './fwd.svg';
-import backIcon from './back.svg';
-import { Stylable } from '../../types';
+import backIcon from './back.svg'
+import { Stylable } from '../../types'
+import { space } from 'styled-system'
+import { PropsOf } from '@emotion/react'
 
 const isTouchDevice = touchDetect();
 
@@ -119,28 +121,12 @@ type Props = {
 };
 
 const Carousel: React.FC<Props & Stylable> = ({
-    shift = 100,
-    timeout = 750,
-    swipeTimeout = 300,
-    interval = null,
-    images,
-    children,
-    className,
+    shift = 100, timeout = 750, swipeTimeout = 300, interval = null,
+    images, children,className,
 }) => {
     const {
-        keys,
-        onFwd,
-        onBack,
-        onJump,
-        index,
-        prev,
-        url,
-        time,
-        oldUrl,
-        enterState,
-        exitState,
-        ref,
-        width,
+        keys, onFwd, onBack, onJump, index, prev, url, time, oldUrl,
+        enterState, exitState, ref,width,
     } = useAdapter(images, timeout, swipeTimeout, interval);
 
     const rest = { width, shift, time };

@@ -1,6 +1,6 @@
 import React from 'react'
 import SplashRouter from './SplashRouter'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import store from '../lib/store'
 import { observer } from 'mobx-react-lite'
 

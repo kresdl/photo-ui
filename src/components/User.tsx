@@ -1,7 +1,7 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import UserRouter from './UserRouter'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useLogout } from '../lib/hooks'
 import { useHistory } from 'react-router-dom'
 import store from '../lib/store'

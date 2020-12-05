@@ -100,7 +100,7 @@ const Organize: React.FC = () => {
                 </p>
               }
               <div key={albumId}>
-                <Photos items={album.data?.photos} onSelect={remove} />
+                <Photos items={album.data?.photos.sort(byTitle)} onSelect={remove} />
               </div>
             </div>
           </>

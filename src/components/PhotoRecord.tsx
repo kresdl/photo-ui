@@ -1,6 +1,6 @@
 import React from 'react'
 import { SavedPhoto } from '../types'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import Thumbnail from './Thumbnail'
 
 const H2 = styled.h2`

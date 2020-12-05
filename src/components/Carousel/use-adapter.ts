@@ -24,8 +24,9 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
 
     const [[enterState, exitState], setState] = useState<[EnterState | null, ExitState | null]>([null, null]);
     const mounted = useMounted()
-    const { current: mem } = useRef<Partial<Static>>({});
-    const urls = useMemo(() => images, [images.join('@')]);
+    const { current: mem } = useRef<Partial<Static>>({})
+    const key = images.join('@')
+    const urls = useMemo(() => images, [key]);
 
     const check = (i?: number) =>
         mounted.current
@@ -104,7 +105,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
     const schedule = () => {
         cancel();
         if (interval) {
-            mem.task = setInterval(next, interval);
+            mem.task = window.setInterval(next, interval);
         }
     };
 
@@ -152,7 +153,6 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
             mem.loadCount = i + 1;
             if (mem.loadCount === 1) {
                 mem.inView = isInView();
-                mem.index = 0;
                 setState(['entered', 'exited']);
                 mem.inView && schedule();
             }
@@ -168,7 +168,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
                 img.src = url;
             })),
             loadCount: 0,
-            index: null,
+            index: 0,
             prev: null,
             url: urls[0],
             oldUrl: undefined,
@@ -179,7 +179,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
     }, [urls]);
 
     useEffect(() => {
-        if (typeof mem.index === 'number') {
+        if (typeof mem.prev === 'number') {
             setState(mem.reverse ? ['enter-left-active', 'exit-right-active'] : ['enter-right-active', 'exit-left-active'])
         }
     }, [mem.index]);
@@ -190,12 +190,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
         enterState, exitState, ref,
         onFwd, onBack, onJump: jump,
         width: ref.current?.clientWidth,
-        index: mem.index,
-        url: mem.url,
-        oldUrl: mem.oldUrl,
-        time: mem.time,
-        prev: mem.prev,
-        keys: mem.keys,
+        ...mem,
     };
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAlbum, useAlbums } from '../lib/hooks'
 import Carousel from './Carousel'
 import styled from '@emotion/styled'
@@ -18,13 +18,10 @@ const Slide: React.FC = () => {
         albums.data?.length && setAlbum(albums.data[0].id)
     }, [albums.data])
 
-
     const images = data?.photos.map(p => p.url)
     if (!images) return null
 
-    const change = (albumId: number) => {
-        setAlbum(albumId)
-    }
+    const change = (albumId: number) => void setAlbum(albumId)
     
     return (
         <>
