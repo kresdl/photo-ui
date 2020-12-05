@@ -24,7 +24,7 @@ const User: React.FC = () => {
         <Sidebar />
       </header>
       <main className="col-md">
-        <div className="pt-5 px-5">
+        <div className="pt-5 px-3">
           <UserRouter />
         </div>
       </main>

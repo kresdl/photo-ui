@@ -68,7 +68,7 @@ const Organize: React.FC = () => {
             }
           </small>
         </h5>
-        <Photos items={photos.data} onSelect={add} disabled={!hasAlbums} />
+        <Photos items={photos.data?.sort(byTitle)} onSelect={add} disabled={!hasAlbums} />
       </div>
       <div className="col-lg-6 pt-5 pt-lg-0">
         <h5 className="mb-4">
@@ -100,7 +100,7 @@ const Organize: React.FC = () => {
                 </p>
               }
               <div key={albumId}>
-                <Photos items={album.data?.photos.sort(byTitle)} onSelect={remove} />
+                <Photos items={album.data?.photos} onSelect={remove} />
               </div>
             </div>
           </>

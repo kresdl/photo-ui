@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Assignment, Saved, SavedAlbum, SavedPhoto } from '../types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
@@ -22,6 +22,33 @@ export const useMounted = () => {
 
   return mount;
 }
+
+export const useOnUIEvent = (target: EventTarget | React.RefObject<HTMLElement>, type: string, handler: (evt?: Event) => void, initialize: boolean, dependencies: any[]) => {
+  useLayoutEffect(() => {
+      const tg = ('current' in target ? target.current : target) as EventTarget;
+
+      let animationFrame: number | null;
+
+      const onRedraw = () => {
+          animationFrame = null;
+      };
+
+      const listener = (evt: Event) => {
+          if (animationFrame) return;
+          animationFrame = requestAnimationFrame(onRedraw);
+          handler(evt)
+      }
+
+      tg.addEventListener(type, listener);
+
+      initialize && handler()
+
+      return () => {
+          animationFrame && cancelAnimationFrame(animationFrame);
+          tg.removeEventListener(type, listener);
+      }
+  }, dependencies);
+};
 
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),

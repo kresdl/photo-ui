@@ -37,7 +37,7 @@ const useCollapse = (duration: number | string) => {
 type Props<T> = React.PropsWithoutRef<TransitionGroupProps> & {
   items?: T[],
   duration: number | string,
-  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactElement,
+  children: (item: T, style: CSSProperties | undefined, ref: (em: HasClientHeight | null) => void) => React.ReactNode,
 }
 
 const Collapsable = <T extends Saved>({ items, children, duration, ...rest }: Props<T>): React.ReactElement => {

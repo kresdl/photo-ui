@@ -3,9 +3,13 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import PhotoEditor from './PhotoEditor'
 import AlbumEditor from './AlbumEditor'
 import Organize from './Organize'
+import Slide from './Slide'
 
 const UserRouter: React.FC = () =>
   <Switch>
+    <Route path="/user/lightbox">
+      <Slide />
+    </Route>
     <Route path="/user/organize">
       <Organize />
     </Route>
