@@ -27,11 +27,11 @@ const AlbumEditor: React.FC = () => {
           <small className="float-right text-secondary">
             {
               albums.msg || albums.error?.message || deleteErr?.message
-              || (albums.data?.length && 'Delete') || 'No albums'
+              || (!albums.data?.length && 'No albums')
             }
           </small>
         </h5>
-        <Albums items={albums.data?.sort(byTitle)} onSelect={deleteAlbum} />
+        <Albums items={albums.data?.sort(byTitle)} nav onDelete={deleteAlbum}/>
       </div>
     </div>
   )

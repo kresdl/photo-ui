@@ -1,19 +1,18 @@
 import React from 'react'
 import Record from './AlbumRecord'
-import { SavedAlbum } from '../types'
-import Selectable from './Selectable'
+import { Listeners, SavedAlbum } from '../types'
+import List from './List'
 
-type Props = {
+type Props = Listeners<SavedAlbum> & {
   items?: SavedAlbum[]
-  onSelect: (item: SavedAlbum) => void,
   disabled?: boolean
 }
 
-const Albums: React.FC<Props> = props =>
-  <Selectable {...props}>
+const Albums: React.FC<Props> = ({ children, items, disabled, ...listeners }) =>
+  <List items={items} disabled={disabled} select={!!listeners.onSelect}>
     {
-      item => <Record {...item} />
+      item => <Record {...item} {...listeners}/>
     }
-  </Selectable>
+  </List>
 
 export default Albums

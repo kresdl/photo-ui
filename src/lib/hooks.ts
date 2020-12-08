@@ -23,31 +23,38 @@ export const useMounted = () => {
   return mount;
 }
 
-export const useOnUIEvent = (target: EventTarget | React.RefObject<HTMLElement>, type: string, handler: (evt?: Event) => void, initialize: boolean, dependencies: any[]) => {
+export const useListener = (target: EventTarget, type: string, handler: (evt: Event) => void, dependencies: any[]) => {
+  useEffect(() => {  
+    target.addEventListener(type, handler);
+
+    return () => {
+      target.removeEventListener(type, handler);
+    }
+  }, dependencies);  
+}
+
+export const useOnUIEvent = (target: EventTarget | React.RefObject<HTMLElement>, type: string, handler: (evt: Event) => void, dependencies: any[]) => {
   useLayoutEffect(() => {
-      const tg = ('current' in target ? target.current : target) as EventTarget;
+    const tg = ('current' in target ? target.current : target) as EventTarget;
+    let animationFrame: number | null;
 
-      let animationFrame: number | null;
+    const onRedraw = () => {
+        animationFrame = null;
+    };
+  
+    const listener = (evt: Event) => {
+        if (animationFrame) return;
+        animationFrame = requestAnimationFrame(onRedraw);
+        handler(evt)
+    }
+  
+    tg.addEventListener(type, listener);
 
-      const onRedraw = () => {
-          animationFrame = null;
-      };
-
-      const listener = (evt: Event) => {
-          if (animationFrame) return;
-          animationFrame = requestAnimationFrame(onRedraw);
-          handler(evt)
-      }
-
-      tg.addEventListener(type, listener);
-
-      initialize && handler()
-
-      return () => {
-          animationFrame && cancelAnimationFrame(animationFrame);
-          tg.removeEventListener(type, listener);
-      }
-  }, dependencies);
+    return () => {
+      animationFrame && cancelAnimationFrame(animationFrame);
+      tg.removeEventListener(type, listener);
+    };
+  }, dependencies);  
 };
 
 export const useLogout = (path: string, redirect: string) => {

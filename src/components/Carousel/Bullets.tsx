@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import React, { MouseEventHandler } from 'react';
+import { space, SpaceProps } from 'styled-system';
 import { Stylable } from '../../types';
 import Bullet from './Bullet';
 
@@ -11,14 +12,10 @@ type Props = {
 };
 
 const Stripe = styled.div({
-    display: 'inline-block',
-    borderRadius: '100px',
-    padding: '0.25rem',
+    flexShrink: 0,
     lineHeight: 0,
     textAlign: 'center',
-    opacity: 0.75,
     cursor: 'default',
-    backgroundColor: 'rgba(0, 0, 0, 0.25)'
 });
 
 const Bullets: React.FC<Props & Stylable> = ({ length, onClick, index, timeout, className }) => {
@@ -37,4 +34,4 @@ const Bullets: React.FC<Props & Stylable> = ({ length, onClick, index, timeout, 
     );
 };
 
-export default Bullets;
+export default styled(Bullets)<SpaceProps>(space);

@@ -23,7 +23,7 @@ const Login: React.FC = () => {
       store.setAuth(token)
       store.notify(null)
       queryCache.clear()
-      history.push('/user')
+      history.push('/user/edit/photos')
     } catch (err) {
       store.notify(err)
     }

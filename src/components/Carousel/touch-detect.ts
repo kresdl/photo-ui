@@ -1,3 +1,5 @@
-export default function tochDetect() {
-    return window.innerWidth < 1000;
+export default function is_touch_enabled() { 
+    return ( 'ontouchstart' in window ) ||  
+           ( navigator.maxTouchPoints > 0 ) ||  
+           ( navigator.msMaxTouchPoints > 0 ); 
 } 

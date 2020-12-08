@@ -4,20 +4,16 @@ import useSwipe from './use-swipe';
 import { useMounted, useOnUIEvent } from '../../lib/hooks';
 
 type Static = {
-    index: number | null;
+    index: number;
     prev: number | null;
     task: number | null;
     busy: boolean;
     reverse: boolean;
-    loadCount: number;
-    url: string;
-    oldUrl: string;
-    promises: Promise<unknown>[];
     keys: [string, string];
     inView: boolean;
     time: number;
-    op: number;
-};
+    refs: HTMLImageElement[];
+}
 
 const useAdapter = (images: string[], timeout: number, swipeTimeout: number, interval: number | null) => {
     if (interval && timeout > interval) throw Error('"timeout" cannot be bigger than "interval"');
@@ -25,8 +21,9 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
     const [[enterState, exitState], setState] = useState<[EnterState | null, ExitState | null]>([null, null]);
     const mounted = useMounted()
     const { current: mem } = useRef<Partial<Static>>({})
-    const key = images.join('@')
-    const urls = useMemo(() => images, [key]);
+    const urls = useMemo(() => images, [images.join('@')]);
+
+    const offs = (offset: number) => (mem.index! + urls.length + offset) % urls.length;
 
     const check = (i?: number) =>
         mounted.current
@@ -34,8 +31,8 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
         && !mem.busy
         && (typeof i === 'undefined' || i !== mem.index);
 
-    const go = (i: number, reverse = false, time = timeout) => {
-        if (!check()) return;
+    const nav = (i: number, reverse = false, time = timeout) => {
+        if (!check(i)) return;
         const [a, b] = mem.keys!;
 
         Object.assign(mem, {
@@ -43,8 +40,6 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
             reverse,
             index: i,
             prev: mem.index,
-            url: urls[i],
-            oldUrl: urls[mem.index!],
             keys: [b, a],
             time,
         });
@@ -53,46 +48,16 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
 
         setTimeout(() => {
             mem.busy = false;
-            if (!check()) return;
-            setState(['entered', 'exited']);
+            if (mounted.current) setState(['entered', 'exited']);
         }, time);
     };
 
-    const wait = async (i: number) => {
-        if (i < mem.loadCount!) return true;
-        cancel();
-        const op = mem.op;
-        await mem.promises![i];
-        if (op !==  mem.op || !check()) return false;
-        schedule();
-        return true;
-    };
-
-    const nav = async (i: number, reverse = false, time = timeout) => {
-        mem.op = Date.now();
-        if (!check(i)) return;
-        const idle = await wait(i);
-        idle && go(i, reverse, time);
-    };
-
-    const next = () => {
-        nav((mem.index! + 1) % urls.length)
-    }
-
     const fwd = (time = timeout) => {
-        nav((mem.index! + 1) % urls.length, false, time)
-        schedule();
+        nav(offs(1), false, time)
     };
 
     const back = (time = timeout) => {
-        const { length } = urls;
-        nav((mem.index! + length - 1) % length, true, time);
-        schedule();
-    };
-
-    const jump = (i: number) => {
-        nav(i, i < mem.index!);
-        schedule();
+        nav(offs(-1), true, time);
     };
 
     const cancel = () => {
@@ -105,7 +70,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
     const schedule = () => {
         cancel();
         if (interval) {
-            mem.task = window.setInterval(next, interval);
+            mem.task = window.setInterval(fwd, interval);
         }
     };
 
@@ -116,66 +81,61 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
         return (r.y < window.innerHeight && r.y + r.height > 0);
     };
 
-    const onFwd: MouseEventHandler = (evt) => {
-        evt.stopPropagation();
-        evt.preventDefault();
-        fwd();
+    const click = (i: number, reverse: boolean, evt?: React.MouseEvent) => {
+        if (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+        }
+        cancel();
+        nav(i, reverse);
     }
 
-    const onBack: MouseEventHandler = (evt) => {
-        evt.stopPropagation();
-        evt.preventDefault();
-        back();
-    }
+    const onFwd: MouseEventHandler = evt => click(offs(1), false, evt);
+    const onBack: MouseEventHandler = evt => click(offs(-1), true, evt);
+    const onJump = (i: number) => click(i, i < mem.index!);
 
     const onSwipe = ([x]: [Number, number]) => {
         if (!x) return;
+        cancel();
         if (x > 0) back(swipeTimeout);
         else fwd(swipeTimeout);
     }
 
     const ref = useRef<HTMLDivElement>(null);
-    
+
     useOnUIEvent(window, 'scroll', () => {
         let inView = isInView();
         if (inView && !mem.inView) schedule();
         if (!inView) cancel();
         mem.inView = inView;
-    }, false, []);
+    }, []);
 
-    useEffect(() => () => void cancel(), []);
+    useEffect(() => {
+        window.addEventListener('focus', schedule);
+        window.addEventListener('blur', cancel);
+        mem.inView = isInView();
+        schedule();
+
+        return () => {
+            window.removeEventListener('focus', schedule);
+            window.removeEventListener('blur', cancel);
+            void cancel();
+        }
+    }, []);
     
     useEffect(() => {
-        const countLoaded = async (i = 0) => {
-            await mem.promises![i];
-            if (!mounted.current) return;
-
-            mem.loadCount = i + 1;
-            if (mem.loadCount === 1) {
-                mem.inView = isInView();
-                setState(['entered', 'exited']);
-                mem.inView && schedule();
-            }
-            if (i < urls.length - 1) countLoaded(i + 1);
-        };
-    
-        cancel();
-
         Object.assign(mem, {
-            promises: urls.map((url) => new Promise<void>((res) => {
-                const img = new Image();
-                img.onload = res as any;
-                img.src = url;
-            })),
-            loadCount: 0,
             index: 0,
             prev: null,
-            url: urls[0],
-            oldUrl: undefined,
-            keys: ['x', 'y'],  
+            keys: ['x', 'y'],
+            refs: urls.map(url => {
+                const img = new Image();
+                img.src = url;
+                return img;
+            }),
         });
 
-        countLoaded();
+        setState(['entered', 'exited']);
     }, [urls]);
 
     useEffect(() => {
@@ -188,8 +148,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
 
     return {
         enterState, exitState, ref,
-        onFwd, onBack, onJump: jump,
-        width: ref.current?.clientWidth,
+        onFwd, onBack, onJump,
         ...mem,
     };
 };

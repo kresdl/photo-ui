@@ -43,7 +43,7 @@ const Collapsable = <T extends Saved>({ items, children, duration, ...rest }: Pr
   const { styles, ref } = useCollapse(duration)
 
   return (
-    <TransitionGroup {...rest}>
+    <TransitionGroup {...rest} id="ul" component="ul">
       {
         items?.map(item =>
           <Transition key={item.id} timeout={{ appear: +duration, exit: +duration }}>

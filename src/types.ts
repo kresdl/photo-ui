@@ -1,5 +1,22 @@
 import { TransitionStatus } from "react-transition-group/Transition"
 
+export type Width = 'narrow' | 'wide'
+
+export type Y = number
+export type X = number
+
+export type Pos = [number, number]
+
+export type Size = number
+
+type Select<T> = (item: T) => void
+
+export type Listeners<T> = {
+  nav?: boolean
+  onSelect?: Select<T>
+  onDelete?: Select<T>
+}
+
 export type JSend<T> = {
   status: 'error' | 'fail' | 'success'
   message?: string

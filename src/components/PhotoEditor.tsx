@@ -34,11 +34,11 @@ const PhotoEditor: React.FC = () => {
           <small className="float-right text-secondary">
             {
               photos.msg || photos.error?.message || deleteErr?.message
-              || (photos.data?.length && 'Delete') || 'No photos'
+              || (!photos.data?.length && 'No photos')
             }
           </small>
         </h5>
-        <Photos items={photos.data?.sort(byTitle)} onSelect={discard} />
+        <Photos items={photos.data?.sort(byTitle)} onDelete={discard} />
       </div>
     </div>
   )

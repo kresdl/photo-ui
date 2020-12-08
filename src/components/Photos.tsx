@@ -1,19 +1,18 @@
 import React from 'react'
 import Record from './PhotoRecord'
-import { SavedPhoto } from '../types'
-import Selectable from './Selectable'
+import { Listeners, SavedPhoto } from '../types'
+import List from './List'
 
-type Props = {
+type Props = Listeners<SavedPhoto> & {
   items?: SavedPhoto[]
-  onSelect: (item: SavedPhoto) => void,
   disabled?: boolean
 }
 
-const Photos: React.FC<Props> = props =>
-  <Selectable {...props}>
+const Photos: React.FC<Props> = ({ children, items, disabled, ...listeners }) =>
+  <List items={items} disabled={disabled} select={!!listeners.onSelect}>
     {
-      item => <Record {...item} />
+      item => <Record {...item} {...listeners} />
     }
-  </Selectable>
+  </List>
 
 export default Photos
