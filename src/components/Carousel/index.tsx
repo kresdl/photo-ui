@@ -52,12 +52,10 @@ type Props = {
     interval?: number | null;
     height?: number;
     children?: React.ReactNode | NodeFactory;
-    onPan?: (index: number) => void;
-    bg?: State
 };
 
 const Carousel: React.FC<Props & Stylable> = ({
-    shift = 100, timeout = 750, swipeTimeout = 300, interval = null, images, children, className, w, h, onPan, bg
+    shift = 100, timeout = 750, swipeTimeout = 300, interval = null, images, children, className, w, h
 }) => {
     const {
         keys, onFwd, onBack, onJump, index, prev, time, enterState, exitState, ref,
@@ -68,10 +66,6 @@ const Carousel: React.FC<Props & Stylable> = ({
     const url = images[index || 0]
     const oldUrl = typeof prev === 'number' ? images[prev] : undefined
 
-    useEffect(() => {
-        if (typeof index === 'number') onPan && onPan(index);
-    }, [index])
-
     const left = <Ctrl mr="0.2rem" src={backIcon} onClick={onBack} />
     const rgt = <Ctrl ml="0.2rem" src={fwdIcon} onClick={onFwd} />
     const stripe = <Bullets mt="0.5rem" length={images.length} index={index} timeout={timeout} onClick={onJump} />
@@ -81,10 +75,10 @@ const Carousel: React.FC<Props & Stylable> = ({
             {
                 keys &&
                 <>
-                    <Img state={enterState} key={keys[0]} url={url} {...rest} index={index!} bps={bg}>
+                    <Img state={enterState} key={keys[0]} url={url} {...rest} index={index!}>
                         {hasChildFactory && typeof index === 'number' && (children as NodeFactory)(index)}
                     </Img>
-                    <Img state={exitState} key={keys[1]} url={oldUrl} {...rest} index={prev!} bps={bg}>
+                    <Img state={exitState} key={keys[1]} url={oldUrl} {...rest} index={prev!}>
                         {hasChildFactory && typeof prev === 'number' && (children as NodeFactory)(prev)}
                     </Img>
                     {!hasChildFactory && children}

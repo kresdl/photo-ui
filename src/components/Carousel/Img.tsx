@@ -1,8 +1,6 @@
 import styled from "@emotion/styled";
-import { widths } from "../../constants";
 import { CSSProperties } from "react";
 import { State } from "./types";
-import { State as Config } from './Slide/reducer';
 
 const genAnim = (width: number, shift: number, time: number | undefined) => {
     const offset = width - shift;
@@ -54,20 +52,6 @@ const genAnim = (width: number, shift: number, time: number | undefined) => {
     } as Record<State, CSSProperties>;
 };
 
-const genTransform = (bps: Config, index: number, width: number) => {
-    const { narrow, wide } = widths
-    const p = 1 - (wide - width) / (wide - narrow)
-    const tf = bps.transforms[index]
-    const x = p * (tf.wide.pos[0] - tf.narrow.pos[0]) + tf.narrow.pos[0]
-    const y = p * (tf.wide.pos[1] - tf.narrow.pos[1]) + tf.narrow.pos[1]
-    const s = p * (tf.wide.size - tf.narrow.size) + tf.narrow.size
-
-    return {
-        backgroundPosition: `${Math.floor(x)}px ${Math.floor(y)}px`,
-        backgroundSize: Math.floor(s * width),
-    }
-}
-
 type ImgProps = {
     url: string | undefined;
     index?: number;
@@ -75,12 +59,10 @@ type ImgProps = {
     shift: number;
     state: State | null;
     time?: number;
-    bps?: Config;
 };
 
-const Img = styled.div<ImgProps>(({ url, state, width = 0, shift, time, bps, index }) => {
+const Img = styled.div<ImgProps>(({ url, state, width = 0, shift, time }) => {
     const extra = genAnim(width, shift, time)[state || 'exited'] as any;
-    const transform = (bps && typeof index === 'number' && genTransform(bps, index, width)) || {}
 
     return {
         position: 'absolute',
@@ -92,7 +74,6 @@ const Img = styled.div<ImgProps>(({ url, state, width = 0, shift, time, bps, ind
         backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
         backgroundColor: 'black',
-        ...transform,
         ...extra,
     };
 });

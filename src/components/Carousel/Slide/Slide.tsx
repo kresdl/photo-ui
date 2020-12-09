@@ -27,6 +27,10 @@ function zoom2scale(zoom: number, minScale: number, maxScale: number) {
     return Math.exp(logScale);
 }
 
+const StyledCarousel = styled(Carousel)`
+    height: 500px;
+`
+
 const defaultWidth: Width = 'narrow'
 
 const Wrapper = styled.div`
@@ -122,22 +126,10 @@ const Slide: React.FC = () => {
     const w = widths[width]
 
     return (
-        <Wrapper className="row">
-            <div className="col-2">
-                <select className="custom-select" value={width} onChange={bp}>
-                    {
-                        Object.keys(widths).map(w => (
-                            <option key={w} value={w}>{w}</option>
-                        ))
-                    }
-                </select>
-            </div>
-            <div className="col-auto">
-                <Div className="d-flex justify-content-center align-items-center" onMouseDown={dragStart} onMouseMove={drag} onMouseUp={dragEnd}>
-                    <Carousel images={images!} onPan={pan} bg={state} w={w} h={600}/>
-                </Div>
-            </div>
-        </Wrapper>
+        <div className="bg-dark">
+
+        <StyledCarousel images={images!} />
+        </div>
     )
 }
 

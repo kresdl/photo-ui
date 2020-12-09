@@ -128,11 +128,6 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
             index: 0,
             prev: null,
             keys: ['x', 'y'],
-            refs: urls.map(url => {
-                const img = new Image();
-                img.src = url;
-                return img;
-            }),
         });
 
         setState(['entered', 'exited']);
