@@ -1,7 +1,7 @@
 import 'firebase/storage'
 import firebase from "firebase/app"
 import { useReducer } from "react"
-import { useMounted } from "../../lib/hooks"
+import { useMounted } from "lib/hooks"
 import { reducer } from "./reducer"
 
 type Loc = {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Photos from './Photos'
 import AlbumSelect from './AlbumSelect'
 import { byTitle } from '../lib/util'
-import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from '../lib/hooks'
+import { useAlbums, useAlbum, usePhotos, useAddPhoto, useRemovePhoto } from 'lib/misc'
 import { SavedPhoto } from '../types'
 
 const Organize: React.FC = () => {

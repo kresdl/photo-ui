@@ -1,42 +1,45 @@
-import { EnterState, ExitState } from './types';
-import { MouseEventHandler, useEffect, useMemo, useRef, useState } from 'react';
-import useSwipe from './use-swipe';
-import { useMounted, useOnUIEvent } from '../../lib/hooks';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useListener, useSwipe } from 'lib/hooks';
+import { useMounted, useOnUIEvent } from 'lib/hooks';
+import animate from './animate';
+import { useAnimation } from 'lib/hooks';
 
 type Static = {
     index: number;
-    prev: number | null;
-    task: number | null;
-    busy: boolean;
-    reverse: boolean;
     keys: [string, string];
-    inView: boolean;
-    time: number;
-    refs: HTMLImageElement[];
+    prev?: number | null;
+    task?: number | null;
+    reverse?: boolean;
+    inView?: boolean;
+    time?: number;
+    refs?: HTMLImageElement[];
+    playing?: boolean;
 }
 
-const useAdapter = (images: string[], timeout: number, swipeTimeout: number, interval: number | null) => {
+const useAdapter = (images: string[], timeout: number, swipeTimeout: number, interval: number | null, shift: number) => {
     if (interval && timeout > interval) throw Error('"timeout" cannot be bigger than "interval"');
 
-    const [[enterState, exitState], setState] = useState<[EnterState | null, ExitState | null]>([null, null]);
     const mounted = useMounted()
-    const { current: mem } = useRef<Partial<Static>>({})
-    const urls = useMemo(() => images, [images.join('@')]);
+    const { current: mem } = useRef<Static>({ 
+        index: 0,
+        keys: ['a', 'b'] 
+    })
+    const key = images.join('@');
+    const urls = useMemo(() => images, [key]);
 
     const offs = (offset: number) => (mem.index! + urls.length + offset) % urls.length;
 
     const check = (i?: number) =>
         mounted.current
         && mem.inView
-        && !mem.busy
+        && !mem.playing
         && (typeof i === 'undefined' || i !== mem.index);
 
-    const nav = (i: number, reverse = false, time = timeout) => {
+    const nav = async (i: number, reverse = false, time = timeout) => {
         if (!check(i)) return;
         const [a, b] = mem.keys!;
 
         Object.assign(mem, {
-            busy: true,
             reverse,
             index: i,
             prev: mem.index,
@@ -44,12 +47,7 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
             time,
         });
 
-        setState(reverse ? ['enter-left', 'exit-right'] : ['enter-right', 'exit-left']);
-
-        setTimeout(() => {
-            mem.busy = false;
-            if (mounted.current) setState(['entered', 'exited']);
-        }, time);
+        play(time)
     };
 
     const fwd = (time = timeout) => {
@@ -90,18 +88,40 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
         nav(i, reverse);
     }
 
-    const onFwd: MouseEventHandler = evt => click(offs(1), false, evt);
-    const onBack: MouseEventHandler = evt => click(offs(-1), true, evt);
-    const onJump = (i: number) => click(i, i < mem.index!);
+    const onFwd = useCallback(
+        (evt: React.MouseEvent) => click(offs(1), false, evt), []
+    )
 
-    const onSwipe = ([x]: [Number, number]) => {
-        if (!x) return;
-        cancel();
-        if (x > 0) back(swipeTimeout);
-        else fwd(swipeTimeout);
-    }
+    const onBack = useCallback(
+        (evt: React.MouseEvent) => click(offs(-1), true, evt), []
+    )
+
+    const onJump = useCallback(
+        (i: number) => click(i, i < mem.index!), []
+    )
+
+    const onSwipe = useCallback(
+        ([x]: [Number, number]) => {
+            if (!x) return;
+            cancel();
+            if (x > 0) back(swipeTimeout);
+            else fwd(swipeTimeout);
+        },
+        [swipeTimeout]
+    )
 
     const ref = useRef<HTMLDivElement>(null);
+
+    const focus = () => {
+        schedule();
+        cache();
+    };
+
+    const cache = () => urls.map(url => {
+        const img = new Image();
+        img.src = url;
+        return img;
+    });
 
     useOnUIEvent(window, 'scroll', () => {
         let inView = isInView();
@@ -111,15 +131,15 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
     }, []);
 
     useEffect(() => {
-        window.addEventListener('focus', schedule);
+        window.addEventListener('focus', focus);
         window.addEventListener('blur', cancel);
         mem.inView = isInView();
         schedule();
 
         return () => {
-            window.removeEventListener('focus', schedule);
+            window.removeEventListener('focus', focus);
             window.removeEventListener('blur', cancel);
-            void cancel();
+            cancel();
         }
     }, []);
     
@@ -128,23 +148,22 @@ const useAdapter = (images: string[], timeout: number, swipeTimeout: number, int
             index: 0,
             prev: null,
             keys: ['x', 'y'],
+            refs: cache(),
         });
 
-        setState(['entered', 'exited']);
+        stop();
     }, [urls]);
-
-    useEffect(() => {
-        if (typeof mem.prev === 'number') {
-            setState(mem.reverse ? ['enter-left-active', 'exit-right-active'] : ['enter-right-active', 'exit-left-active'])
-        }
-    }, [mem.index]);
 
     useSwipe(ref, onSwipe);
 
+    const { cursor, playing, play, stop } = useAnimation()
+    mem.playing = playing;
+
     return {
-        enterState, exitState, ref,
-        onFwd, onBack, onJump,
-        ...mem,
+        state: playing 
+            ? animate(cursor!, shift, mem.reverse)
+            : null,
+        ref, onFwd, onBack, onJump, ...mem,
     };
 };
 

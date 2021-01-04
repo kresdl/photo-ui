@@ -1,5 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { Assignment, Saved, SavedAlbum, SavedPhoto } from '../types'
 import {
   downloadAlbum, downloadPhotos, downloadAlbums, addPhotoToAlbum,
@@ -9,53 +9,6 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useQuery, useMutation, queryCache, QueryStatus, QueryConfig, MutationConfig } from 'react-query'
 import update from 'immutability-helper'
 import store from './store'
-
-export const useMounted = () => {
-  const mount = useRef(false)
-  useEffect(() => {
-    mount.current = true
-
-    return () => { 
-      mount.current = false
-    }
-   }, [])
-
-  return mount;
-}
-
-export const useListener = (target: EventTarget, type: string, handler: (evt: Event) => void, dependencies: any[]) => {
-  useEffect(() => {  
-    target.addEventListener(type, handler);
-
-    return () => {
-      target.removeEventListener(type, handler);
-    }
-  }, dependencies);  
-}
-
-export const useOnUIEvent = (target: EventTarget | React.RefObject<HTMLElement>, type: string, handler: (evt: Event) => void, dependencies: any[]) => {
-  useLayoutEffect(() => {
-    const tg = ('current' in target ? target.current : target) as EventTarget;
-    let animationFrame: number | null;
-
-    const onRedraw = () => {
-        animationFrame = null;
-    };
-  
-    const listener = (evt: Event) => {
-        if (animationFrame) return;
-        animationFrame = requestAnimationFrame(onRedraw);
-        handler(evt)
-    }
-  
-    tg.addEventListener(type, listener);
-
-    return () => {
-      animationFrame && cancelAnimationFrame(animationFrame);
-      tg.removeEventListener(type, listener);
-    };
-  }, dependencies);  
-};
 
 export const useLogout = (path: string, redirect: string) => {
   const history = useHistory(),

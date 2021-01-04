@@ -1,13 +1,13 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import styled from '@emotion/styled'
-import { useLogout } from '../lib/hooks'
-import { Route, Switch, useHistory } from 'react-router-dom'
+import { useLogout } from 'lib/misc'
+import { Route, useHistory } from 'react-router-dom'
 import store from '../lib/store'
 import Organize from './Organize'
 import PhotoEditor from './PhotoEditor'
 import AlbumEditor from './AlbumEditor'
-import Slide from './Carousel/Slide/Slide'
+import Slide from './Slide'
 
 const Wrapper = styled.div`
   @media screen and (min-width: 768px) {

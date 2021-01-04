@@ -2,7 +2,7 @@ import React from 'react'
 import UploadAlbum from './UploadAlbum'
 import Albums from './Albums'
 import { byTitle } from '../lib/util'
-import { useAlbums, useDeleteAlbum, useUploadAlbum } from '../lib/hooks'
+import { useAlbums, useDeleteAlbum, useUploadAlbum } from 'lib/misc'
 
 const AlbumEditor: React.FC = () => {
   const albums = useAlbums()

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { MouseEventHandler } from 'react';
+import React, { memo, MouseEventHandler } from 'react';
 import { space, SpaceProps } from 'styled-system';
 import { Stylable } from '../../types';
 import Bullet from './Bullet';

@@ -14,7 +14,7 @@ ReactDOM.render(
         <App />
       </BrowserRouter>
     </React.StrictMode>
-    <ReactQueryDevtools />
+    {/*<ReactQueryDevtools />*/}
   </>,
   document.getElementById('root')
 );

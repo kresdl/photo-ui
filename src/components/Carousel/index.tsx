@@ -1,50 +1,45 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Ctrl from './Ctrl';
 import Bullets from './Bullets';
 import useAdapter from './use-adapter';
 import styled from '@emotion/styled';
-import Img from './Img';
 import touchDetect from './touch-detect';
 import fwdIcon from './fwd.svg';
 import backIcon from './back.svg'
 import { Stylable } from '../../types'
-import { State } from './Slide/reducer';
 
 const isTouchDevice = touchDetect();
 
+const f2p = (...vals: number[]) => vals.map(val => 100 * val + '%')
+
 const YFlex = styled.div({
-    flexDirection: 'column',
-    height: '100%',
     display: 'flex',
+    flexDirection: 'column',
 })
 
-
 const XFlex = styled.div({
+    display: 'flex',
+    height: '100%',
     flexGrow: 1,
     flexShrink: 0,
-    display: 'flex',
     alignItems: 'center',
 })
 
-type FProps = {
-    w?: number | string
-    h?: number | string
-}
-
-const Frame = styled.div<FProps>(p => ({
-    width: p.w,
-    height: p.h ? p.h : '100%',
-    flexShrink: 0,
+const Frame = styled.div({
+    height: '100%',
     flexGrow: 1,
+    flexShrink: 0,
     position: 'relative',
-    overflow: 'hidden',
-}));
+});
+
+const Svg = styled.svg({
+    width: '100%',
+});
 
 type NodeFactory = (index: number) => React.ReactNode;
 
 type Props = {
     images: string[];
-    w?: number;
     h?: number;
     shift?: number;
     timeout?: number;
@@ -55,39 +50,38 @@ type Props = {
 };
 
 const Carousel: React.FC<Props & Stylable> = ({
-    shift = 100, timeout = 750, swipeTimeout = 300, interval = null, images, children, className, w, h
-}) => {
+    shift = 0.2, timeout = 750, swipeTimeout = 300, interval = null, images, children, className, h }) => {
+
     const {
-        keys, onFwd, onBack, onJump, index, prev, time, enterState, exitState, ref,
-    } = useAdapter(images, timeout, swipeTimeout, interval);
+        keys, onFwd, onBack, onJump, index, prev, state, ref,
+    } = useAdapter(images, timeout, swipeTimeout, interval, shift),
 
-    const rest = { width: w || ref.current?.clientWidth, shift, time };
-    const hasChildFactory = typeof children === 'function';
-    const url = images[index || 0]
-    const oldUrl = typeof prev === 'number' ? images[prev] : undefined
+        hasChildFactory = typeof children === 'function',
+        url = images[index],
+        oldUrl = typeof prev === 'number' ? images[prev] : undefined,
+        [mx, mw, ax, bx] = f2p(state?.mask.x || 0, state?.mask.width || 0, state?.a.x || 0, state?.b.x || 0),
+        [a, b] = keys,
 
-    const left = <Ctrl mr="0.2rem" src={backIcon} onClick={onBack} />
-    const rgt = <Ctrl ml="0.2rem" src={fwdIcon} onClick={onFwd} />
-    const stripe = <Bullets mt="0.5rem" length={images.length} index={index} timeout={timeout} onClick={onJump} />
+        left = <Ctrl mr="0.2rem" src={backIcon} onClick={onBack} />,
+        rgt = <Ctrl ml="0.2rem" src={fwdIcon} onClick={onFwd} />,
+        stripe = <Bullets mt="0.5rem" length={images.length} index={index} timeout={timeout} onClick={onJump} />,
 
-    const frame = (
-        <Frame ref={ref} w={w} h={h}>
-            {
-                keys &&
-                <>
-                    <Img state={enterState} key={keys[0]} url={url} {...rest} index={index!}>
-                        {hasChildFactory && typeof index === 'number' && (children as NodeFactory)(index)}
-                    </Img>
-                    <Img state={exitState} key={keys[1]} url={oldUrl} {...rest} index={prev!}>
-                        {hasChildFactory && typeof prev === 'number' && (children as NodeFactory)(prev)}
-                    </Img>
+        frame = (
+            <Frame ref={ref}>
+                <Svg xmlns="http://www.w3.org/2000/svg" width="100" height={h}>
+                    <defs>
+                        <mask id="mask" x="0" y="0" width="100%" height="100%">
+                            <rect fill="white" x={mx} y="0" width={mw} height="100%" />
+                        </mask>
+                    </defs>
+                    <image key={a} x={ax} y="0" width="100%" height="100%" href={url} preserveAspectRatio="xMidYMid slice" />
+                    <image key={b} x={bx} y="0" width="100%" height="100%" href={oldUrl} mask="url(#mask)" preserveAspectRatio="xMidYMid slice" />
                     {!hasChildFactory && children}
-                </>
-            }
-        </Frame>
-    );
+                </Svg>
+            </Frame>
+        ),
 
-    const content = isTouchDevice ? frame : [left, frame, rgt];
+        content = isTouchDevice ? frame : [left, frame, rgt];
 
     return (
         <YFlex className={className}>

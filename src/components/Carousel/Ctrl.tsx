@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from '@emotion/styled';
 import { MouseEventHandler } from 'react';
 import { space, SpaceProps } from 'styled-system';

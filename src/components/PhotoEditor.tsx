@@ -2,7 +2,7 @@ import React from 'react'
 import UploadPhoto from './UploadPhoto'
 import Photos from './Photos'
 import { byTitle } from '../lib/util'
-import { usePhotos, useDeletePhoto, useUploadPhoto } from '../lib/hooks'
+import { usePhotos, useDeletePhoto, useUploadPhoto } from 'lib/misc'
 import firebase from 'firebase/app'
 import { SavedPhoto } from '../types'
 
